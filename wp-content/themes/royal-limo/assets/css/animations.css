@@ -1,0 +1,45 @@
+/* ==========================================================================
+   Base states for GSAP-driven reveals. GSAP sets these via .set()/.from(),
+   but we pre-hide with CSS too so there's no flash-of-unstyled-content if
+   JS is slow to attach, and so it degrades gracefully with JS disabled.
+   ========================================================================== */
+
+[data-rl-animate] {
+	opacity: 1;
+}
+
+.js .rl-reveal {
+	opacity: 0;
+	transform: translateY(28px);
+}
+
+.js .rl-fleet-card,
+.js .rl-service-card {
+	opacity: 0;
+	transform: translateY(36px) scale(0.94);
+}
+
+/* If JS never runs (disabled/blocked), content must still be visible. */
+.no-js .rl-reveal,
+.no-js .rl-fleet-card,
+.no-js .rl-service-card {
+	opacity: 1;
+	transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.js .rl-reveal,
+	.js .rl-fleet-card,
+	.js .rl-service-card {
+		opacity: 1;
+		transform: none;
+	}
+}
+
+/*
+ * Hero carousel copy is intentionally NOT pre-hidden by CSS (unlike
+ * .rl-reveal above): it starts fully visible, and animations.js uses
+ * gsap.fromTo() (which sets its own starting opacity via JS) to animate
+ * it — so if GSAP fails to load, the text simply never animates instead
+ * of being stuck invisible forever.
+ */

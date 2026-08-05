@@ -1,0 +1,41 @@
+/* ==========================================================================
+   Glassmorphism utilities
+   ========================================================================== */
+
+.glass-panel {
+	background: var(--glass-bg);
+	border: 1px solid var(--glass-border);
+	border-radius: var(--radius-lg);
+	backdrop-filter: blur(var(--glass-blur));
+	-webkit-backdrop-filter: blur(var(--glass-blur));
+	box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
+}
+
+.glass-nav {
+	border-radius: 0;
+	border-left: none;
+	border-right: none;
+	border-top: none;
+	background: rgba(10, 10, 10, 0.55);
+}
+
+/* Only the sticky nav gets backdrop-filter always-on; other glass panels
+   rely on a solid fallback for browsers/devices without support, since
+   backdrop-filter is GPU-costly and shouldn't run everywhere at once. */
+@supports not (backdrop-filter: blur(1px)) {
+	.glass-panel {
+		background: rgba(18, 18, 18, 0.92);
+	}
+}
+
+.site-header {
+	position: sticky;
+	top: 0;
+	z-index: 100;
+	transition: background var(--transition-med), box-shadow var(--transition-med);
+}
+
+.site-header.is-scrolled {
+	background: rgba(8, 8, 8, 0.8);
+	box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+}

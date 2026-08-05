@@ -1,0 +1,19 @@
+# This repo tracks only wp-content (the custom theme and site content) —
+# WordPress core (wp-admin, wp-includes, root PHP files) and wp-config.php
+# (contains DB credentials and auth salts) are intentionally not tracked.
+/*
+!/wp-content/
+!/.gitignore
+
+# Generated/runtime files inside wp-content
+wp-content/debug.log
+wp-content/upgrade/
+wp-content/cache/
+
+# Default bundled plugins not used by this project (only Contact Form 7 is)
+wp-content/plugins/akismet/
+wp-content/plugins/hello.php
+
+# OS/editor cruft
+.DS_Store
+Thumbs.db

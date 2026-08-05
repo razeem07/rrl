@@ -1,0 +1,115 @@
+/* ==========================================================================
+   Neumorphism: buttons, inputs, icon tiles (soft dual-shadow on dark surface)
+   ========================================================================== */
+
+.rl-btn {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 0.5rem;
+	padding: 0.85rem 1.75rem;
+	border: none;
+	border-radius: var(--radius-pill);
+	font-weight: 600;
+	font-size: 0.95rem;
+	color: var(--text-light);
+	background: var(--surface);
+	box-shadow:
+		6px 6px 12px var(--neu-dark),
+		-6px -6px 12px var(--neu-light);
+	transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.rl-btn:hover {
+	transform: translateY(-2px);
+	box-shadow:
+		8px 8px 16px var(--neu-dark),
+		-8px -8px 16px var(--neu-light);
+}
+
+.rl-btn:active {
+	transform: translateY(0);
+	box-shadow:
+		inset 4px 4px 8px var(--neu-dark),
+		inset -4px -4px 8px var(--neu-light);
+}
+
+.rl-btn--gold {
+	color: var(--bg-black);
+	background: linear-gradient(135deg, var(--gold-soft), var(--gold));
+}
+
+.rl-btn--sm {
+	padding: 0.55rem 1.15rem;
+	font-size: 0.85rem;
+}
+
+.rl-btn--icon-left {
+	padding-left: 0.5rem;
+}
+
+.rl-btn__icon {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 26px;
+	height: 26px;
+	border-radius: 50%;
+	background: rgba(0, 0, 0, 0.25);
+	flex: 0 0 auto;
+}
+
+.rl-btn--gold .rl-btn__icon {
+	background: rgba(10, 10, 10, 0.2);
+}
+
+.rl-btn--neu:not(.rl-btn--gold) .rl-btn__icon {
+	background: rgba(255, 255, 255, 0.08);
+}
+
+.rl-icon-tile {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 42px;
+	height: 42px;
+	border-radius: var(--radius-md);
+	background: var(--surface);
+	box-shadow:
+		4px 4px 8px var(--neu-dark),
+		-4px -4px 8px var(--neu-light);
+	font-weight: 700;
+	font-size: 0.85rem;
+	color: var(--gold);
+	transition: transform var(--transition-fast);
+}
+
+.rl-icon-tile:hover {
+	transform: translateY(-2px);
+}
+
+.rl-input {
+	width: 100%;
+	padding: 0.85rem 1.1rem;
+	border: none;
+	border-radius: var(--radius-sm);
+	background: var(--surface);
+	color: var(--text-light);
+	font-family: inherit;
+	font-size: 0.95rem;
+}
+
+.rl-input--neu {
+	box-shadow:
+		inset 3px 3px 6px var(--neu-dark),
+		inset -3px -3px 6px var(--neu-light);
+}
+
+.rl-input--neu::placeholder {
+	color: var(--text-muted);
+}
+
+.rl-input--neu:focus {
+	outline: 2px solid var(--gold);
+	outline-offset: 2px;
+}
