@@ -40,7 +40,8 @@ $logos = $logos_query->posts;
 
 			<div class="rl-video-card" data-rl-cascade <?php if ( $video['image_url'] ) : ?>style="background-image: linear-gradient(180deg, rgba(10,10,10,.1), rgba(10,10,10,.5)), url('<?php echo esc_url( $video['image_url'] ); ?>');"<?php endif; ?>>
 				<?php if ( $video['video_url'] ) : ?>
-					<button type="button" class="rl-video-card__play" data-rl-video-play data-video-url="<?php echo esc_url( $video['video_url'] ); ?>" aria-label="<?php esc_attr_e( 'Play video', 'royal-limo' ); ?>">
+					<div class="rl-video-card__bg" data-rl-video-bg data-video-url="<?php echo esc_url( $video['video_url'] ); ?>" aria-hidden="true"></div>
+					<button type="button" class="rl-video-card__play" data-rl-video-play data-video-url="<?php echo esc_url( $video['video_url'] ); ?>" aria-label="<?php esc_attr_e( 'Play video with sound', 'royal-limo' ); ?>">
 						<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
 					</button>
 				<?php endif; ?>

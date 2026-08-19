@@ -16,13 +16,15 @@ if ( ! class_exists( 'WPCF7' ) ) {
 // Don't load CF7's default stylesheet; our own CSS handles all styling.
 add_filter( 'wpcf7_load_css', '__return_false' );
 
-/**
- * Add our own utility classes onto CF7's generated form wrapper.
- */
-function royal_limo_cf7_form_class( $class ) {
-	return $class . ' rl-quote-form glass-panel';
-}
-add_filter( 'wpcf7_form_class_attr', 'royal_limo_cf7_form_class' );
+// The .rl-quote-form/.glass-panel/.rl-quote-form__row wrapper divs already
+// live inside the form template itself (see the "form" property set when
+// the contact form was created), so the outer <form> tag needs no extra
+// classes — adding them here would double up the padding/background.
+
+// CF7 auto-inserts <p>/<br> around lines in the form template by default,
+// which breaks the custom .rl-quote-form__row grid wrapper divs. The
+// template already provides its own structure, so turn that off.
+add_filter( 'wpcf7_autop_or_not', '__return_false' );
 
 /**
  * Style the submit button as a neumorphic CTA.

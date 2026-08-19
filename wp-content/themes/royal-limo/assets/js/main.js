@@ -48,6 +48,35 @@
 		}
 	} );
 
+	// Category filter tabs (Fleet homepage teaser) — client-side show/
+	// hide by data-categories, no page reload. Cards with no categories
+	// assigned always match "All" but never match a specific filter,
+	// same as leaving a WP post uncategorized.
+	document.querySelectorAll( '[data-rl-filter-group]' ).forEach( function ( group ) {
+		var target = group.parentElement.querySelector( '[data-rl-filter-target]' );
+		if ( ! target ) {
+			return;
+		}
+		var buttons = group.querySelectorAll( '[data-filter]' );
+		var cards = target.children;
+
+		buttons.forEach( function ( button ) {
+			button.addEventListener( 'click', function () {
+				var filter = button.getAttribute( 'data-filter' );
+
+				buttons.forEach( function ( b ) {
+					b.classList.toggle( 'is-active', b === button );
+				} );
+
+				Array.prototype.forEach.call( cards, function ( card ) {
+					var categories = ( card.getAttribute( 'data-categories' ) || '' ).split( ' ' );
+					var matches = 'all' === filter || categories.indexOf( filter ) !== -1;
+					card.style.display = matches ? '' : 'none';
+				} );
+			} );
+		} );
+	} );
+
 	// Testimonial carousel (plain JS, no plugin).
 	document.querySelectorAll( '[data-rl-carousel]' ).forEach( function ( carousel ) {
 		var track = carousel.querySelector( '.rl-testimonial-track' );
@@ -81,6 +110,30 @@
 		if ( slides.length > 1 ) {
 			resetTimer();
 		}
+	} );
+
+	// Fleet detail page image gallery (single-fleet.php) — dot
+	// navigation only, no autoplay (unlike the testimonial/hero
+	// carousels above): a vehicle's photos aren't time-sensitive
+	// content, so cycling them automatically would just be distracting.
+	document.querySelectorAll( '[data-rl-fleet-gallery]' ).forEach( function ( gallery ) {
+		var track = gallery.querySelector( '.rl-fleet-gallery__track' );
+		var slides = gallery.querySelectorAll( '.rl-fleet-gallery__slide' );
+		var dots = gallery.querySelectorAll( '.rl-fleet-gallery__dot' );
+
+		function goTo( index ) {
+			index = ( index + slides.length ) % slides.length;
+			track.style.transform = 'translateX(-' + ( index * 100 ) + '%)';
+			dots.forEach( function ( dot, di ) {
+				dot.classList.toggle( 'is-active', di === index );
+			} );
+		}
+
+		dots.forEach( function ( dot ) {
+			dot.addEventListener( 'click', function () {
+				goTo( parseInt( dot.getAttribute( 'data-index' ), 10 ) );
+			} );
+		} );
 	} );
 
 	// Hero banner carousel (plain JS core; animations.js optionally
@@ -183,12 +236,25 @@
 
 	// Video Showcase lightbox — hand-rolled, no external lightbox library.
 	// Detects YouTube/Vimeo URLs and builds the matching embed; anything
-	// else is treated as a direct video file.
-	function buildVideoEmbed( url ) {
+	// else is treated as a direct video file. `opts` lets the same
+	// builder serve two different uses: the lightbox (sound on, native
+	// controls) and the silent background preview below (muted, looping,
+	// no controls) — see [data-rl-video-bg] further down.
+	function buildVideoEmbed( url, opts ) {
+		opts = opts || {};
+		var muted = !! opts.muted;
+		var loop = !! opts.loop;
+		var showControls = false !== opts.controls;
+
 		var youtubeMatch = url.match( /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([\w-]+)/ );
 		if ( youtubeMatch ) {
+			var videoId = youtubeMatch[ 1 ];
+			var ytParams = [ 'autoplay=1', 'rel=0', 'playsinline=1' ];
+			if ( muted ) { ytParams.push( 'mute=1' ); }
+			if ( loop ) { ytParams.push( 'loop=1', 'playlist=' + videoId ); }
+			if ( ! showControls ) { ytParams.push( 'controls=0' ); }
 			var iframe = document.createElement( 'iframe' );
-			iframe.src = 'https://www.youtube.com/embed/' + youtubeMatch[ 1 ] + '?autoplay=1&rel=0';
+			iframe.src = 'https://www.youtube.com/embed/' + videoId + '?' + ytParams.join( '&' );
 			iframe.setAttribute( 'allow', 'autoplay; encrypted-media; picture-in-picture' );
 			iframe.setAttribute( 'allowfullscreen', '' );
 			iframe.setAttribute( 'frameborder', '0' );
@@ -197,8 +263,12 @@
 
 		var vimeoMatch = url.match( /vimeo\.com\/(\d+)/ );
 		if ( vimeoMatch ) {
+			var vimeoParams = [ 'autoplay=1' ];
+			if ( muted ) { vimeoParams.push( 'muted=1' ); }
+			if ( loop ) { vimeoParams.push( 'loop=1' ); }
+			if ( ! showControls ) { vimeoParams.push( 'controls=0', 'background=1' ); }
 			var vIframe = document.createElement( 'iframe' );
-			vIframe.src = 'https://player.vimeo.com/video/' + vimeoMatch[ 1 ] + '?autoplay=1';
+			vIframe.src = 'https://player.vimeo.com/video/' + vimeoMatch[ 1 ] + '?' + vimeoParams.join( '&' );
 			vIframe.setAttribute( 'allow', 'autoplay; encrypted-media; picture-in-picture' );
 			vIframe.setAttribute( 'allowfullscreen', '' );
 			vIframe.setAttribute( 'frameborder', '0' );
@@ -207,9 +277,11 @@
 
 		var video = document.createElement( 'video' );
 		video.src = url;
-		video.controls = true;
 		video.autoplay = true;
 		video.playsInline = true;
+		video.controls = showControls;
+		video.muted = muted;
+		video.loop = loop;
 		return video;
 	}
 
@@ -264,6 +336,52 @@
 			closeBtn.focus();
 		} );
 	} );
+
+	// Video Showcase background preview — once the card scrolls into
+	// view, a muted/looping copy of the same video plays silently behind
+	// the poster image (the button above still opens the full lightbox
+	// with sound). Plain IntersectionObserver, not GSAP/ScrollTrigger —
+	// this is core behavior, not a decorative animation, so it shouldn't
+	// depend on those loading. Skipped under prefers-reduced-motion,
+	// same as every other motion effect in this theme; the static poster
+	// image underneath is a complete result on its own either way.
+	var prefersReducedMotionForVideo = window.matchMedia( '(prefers-reduced-motion: reduce)' ).matches;
+	if ( ! prefersReducedMotionForVideo && 'IntersectionObserver' in window ) {
+		var videoBgEls = document.querySelectorAll( '[data-rl-video-bg]' );
+		if ( videoBgEls.length ) {
+			var videoBgObserver = new IntersectionObserver( function ( entries, observer ) {
+				entries.forEach( function ( entry ) {
+					if ( ! entry.isIntersecting ) {
+						return;
+					}
+					var container = entry.target;
+					var url = container.getAttribute( 'data-video-url' );
+					if ( url ) {
+						var embed = buildVideoEmbed( url, { muted: true, loop: true, controls: false } );
+						container.appendChild( embed );
+						if ( 'VIDEO' === embed.tagName ) {
+							// Autoplay is muted so browsers should allow it, but
+							// dynamically-inserted <video> elements don't always
+							// honor the autoplay attribute reliably — call
+							// play() directly and swallow a rejected promise
+							// (e.g. a browser blocking it anyway) rather than
+							// letting it surface as an unhandled error; the
+							// poster image is still showing either way.
+							var playResult = embed.play();
+							if ( playResult && 'function' === typeof playResult.catch ) {
+								playResult.catch( function () {} );
+							}
+						}
+					}
+					observer.unobserve( container );
+				} );
+			}, { threshold: 0.4 } );
+
+			videoBgEls.forEach( function ( el ) {
+				videoBgObserver.observe( el );
+			} );
+		}
+	}
 
 	// FAQ accordion — single-open (opening one closes any other), pure
 	// CSS handles the height transition (grid-template-rows on

@@ -148,11 +148,92 @@ function royal_limo_why_choose_us() {
 }
 
 /**
+ * The About page "Our Approach" section: eyebrow/heading, an image (or
+ * fallback background if left blank), and two editorial blocks (Mission
+ * / Vision), each with two checklist points. Content set via
+ * Customizer > Our Approach Section.
+ */
+function royal_limo_our_approach() {
+	return array(
+		'eyebrow'         => get_theme_mod( 'royal_limo_approach_eyebrow', 'Our Approach' ),
+		'heading'         => get_theme_mod( 'royal_limo_approach_heading', 'Our Approach to Effortless Chauffeured Travel' ),
+		'image_url'       => get_theme_mod( 'royal_limo_approach_image', '' ),
+		'mission_heading' => get_theme_mod( 'royal_limo_approach_mission_heading', 'Our Mission' ),
+		'mission_points'  => array(
+			get_theme_mod( 'royal_limo_approach_mission_point1', 'Deliver reliable, punctual transportation on every single trip' ),
+			get_theme_mod( 'royal_limo_approach_mission_point2', 'Treat every rider with the same care and discretion as our first' ),
+		),
+		'vision_heading'  => get_theme_mod( 'royal_limo_approach_vision_heading', 'Our Vision' ),
+		'vision_points'   => array(
+			get_theme_mod( 'royal_limo_approach_vision_point1', 'Set the standard for luxury chauffeured travel in Los Angeles' ),
+			get_theme_mod( 'royal_limo_approach_vision_point2', 'Build lasting trust with every client, one journey at a time' ),
+		),
+	);
+}
+
+/**
+ * The About page "What We Do" section: eyebrow/heading/description, an
+ * image (or fallback background if left blank), and 4 fixed feature
+ * items (icon is fixed per slot in the template — only heading/
+ * description are editable). Content set via Customizer > What We Do
+ * Section.
+ */
+function royal_limo_what_we_do() {
+	$defaults = array(
+		1 => array( 'heading' => 'Instant Online Booking', 'description' => 'Reserve your chauffeur in minutes with real-time confirmation.' ),
+		2 => array( 'heading' => 'Flight-Tracked Pickups', 'description' => 'We monitor your flight and adjust pickup times automatically.' ),
+		3 => array( 'heading' => 'Flexible Ride Packages', 'description' => 'Hourly, point-to-point, or full-day charters to suit your plans.' ),
+		4 => array( 'heading' => '24/7 Client Support', 'description' => 'A reservations specialist is always available, day or night.' ),
+	);
+
+	$features = array();
+	for ( $i = 1; $i <= 4; $i++ ) {
+		$features[] = array(
+			'heading'     => get_theme_mod( "royal_limo_what_we_do_{$i}_heading", $defaults[ $i ]['heading'] ),
+			'description' => get_theme_mod( "royal_limo_what_we_do_{$i}_description", $defaults[ $i ]['description'] ),
+		);
+	}
+
+	return array(
+		'eyebrow'     => get_theme_mod( 'royal_limo_what_we_do_eyebrow', 'What We Do' ),
+		'heading'     => get_theme_mod( 'royal_limo_what_we_do_heading', 'Your Trusted Chauffeured Travel Partner' ),
+		'description' => get_theme_mod( 'royal_limo_what_we_do_description', "From the moment you book to the moment you arrive, we handle every detail of the ride so you don't have to." ),
+		'image_url'   => get_theme_mod( 'royal_limo_what_we_do_image', '' ),
+		'features'    => $features,
+	);
+}
+
+/**
+ * "Key Persons" / team section header (eyebrow/heading/description) —
+ * the cards themselves come straight from the "team_member" CPT in the
+ * template.
+ */
+function royal_limo_team_section() {
+	return array(
+		'eyebrow'     => get_theme_mod( 'royal_limo_team_eyebrow', 'Key Persons' ),
+		'heading'     => get_theme_mod( 'royal_limo_team_heading', 'Meet the People Behind Every Journey' ),
+		'description' => get_theme_mod( 'royal_limo_team_description', 'The experienced team ensuring every ride is punctual, professional, and worry-free.' ),
+	);
+}
+
+/**
  * The "Video Showcase" section content. Fallback defaults here must
  * match the 'default' values registered in inc/customizer.php.
  */
 function royal_limo_video_showcase() {
-	$image_id = get_theme_mod( 'royal_limo_video_image', '' );
+	// The image control's setting already holds the attachment URL (see
+	// the sanitize_callback note in inc/customizer.php) — use it as-is,
+	// no wp_get_attachment_image_url() lookup needed/possible.
+	$video_url = get_theme_mod( 'royal_limo_video_url', '' );
+	if ( $video_url && ! preg_match( '#^(https?:)?//#i', $video_url ) ) {
+		// Admin pasted a site-relative path (e.g. "/wp-content/uploads/
+		// ...") instead of a full URL — resolve it against the real
+		// site URL rather than leaving it to resolve against the
+		// browser's current origin, which breaks on any install that
+		// isn't at the domain root (subdirectory installs, this local
+		// XAMPP setup, etc).
+		$video_url = home_url( '/' . ltrim( $video_url, '/' ) );
+	}
 
 	return array(
 		'eyebrow'     => get_theme_mod( 'royal_limo_video_eyebrow', 'Watch Video' ),
@@ -160,8 +241,8 @@ function royal_limo_video_showcase() {
 		'description' => get_theme_mod( 'royal_limo_video_description', 'Discover how easy and comfortable it is to book with us. This short video gives you a quick look at our fleet, our chauffeurs, and how simple the booking process really is.' ),
 		'check1'      => get_theme_mod( 'royal_limo_video_check1', 'See Our Fleet Quality and Comfort' ),
 		'check2'      => get_theme_mod( 'royal_limo_video_check2', 'Learn About Easy Booking Steps' ),
-		'image_url'   => $image_id ? wp_get_attachment_image_url( $image_id, 'full' ) : '',
-		'video_url'   => get_theme_mod( 'royal_limo_video_url', '' ),
+		'image_url'   => get_theme_mod( 'royal_limo_video_image', '' ),
+		'video_url'   => $video_url,
 	);
 }
 
@@ -175,6 +256,20 @@ function royal_limo_fleet_section() {
 		'heading'     => get_theme_mod( 'royal_limo_fleet_heading', 'Featured Luxury Fleet' ),
 		'description' => get_theme_mod( 'royal_limo_fleet_description', 'Explore a hand-selected range of executive sedans, SUVs, and stretch limousines — each maintained to the highest standard and ready for your next reservation.' ),
 	);
+}
+
+/**
+ * Fleet Category terms that actually have at least one vehicle —
+ * powers the filter tabs on the homepage teaser and the /fleet/
+ * archive. Returns an empty array (not WP_Error) if the taxonomy has
+ * no terms yet, so callers can just check truthiness.
+ */
+function royal_limo_fleet_categories() {
+	$terms = get_terms( array(
+		'taxonomy'   => 'fleet_category',
+		'hide_empty' => true,
+	) );
+	return is_wp_error( $terms ) ? array() : $terms;
 }
 
 /**
@@ -230,15 +325,16 @@ function royal_limo_faq_section() {
  * Content set via Customizer > Booking CTA Section.
  */
 function royal_limo_booking_cta() {
-	$image_id = get_theme_mod( 'royal_limo_booking_cta_image', '' );
-
 	return array(
 		'eyebrow'     => get_theme_mod( 'royal_limo_booking_cta_eyebrow', 'Contact Today' ),
 		'heading'     => get_theme_mod( 'royal_limo_booking_cta_heading', 'Connect With Us for Booking Support Today!' ),
 		'description' => get_theme_mod( 'royal_limo_booking_cta_description', 'Our friendly and professional team is ready to help you plan the perfect ride for any occasion — whether you have questions, need assistance with booking, or want to confirm the details of an upcoming trip.' ),
 		'check1'      => get_theme_mod( 'royal_limo_booking_cta_check1', 'Speak With a Reservations Specialist' ),
 		'check2'      => get_theme_mod( 'royal_limo_booking_cta_check2', 'Get Real-Time Booking Confirmation' ),
-		'image_url'   => $image_id ? wp_get_attachment_image_url( $image_id, 'full' ) : '',
+		// The image control's setting already holds the attachment URL
+		// (see the sanitize_callback note in inc/customizer.php) — use
+		// it as-is, no wp_get_attachment_image_url() lookup needed.
+		'image_url'   => get_theme_mod( 'royal_limo_booking_cta_image', '' ),
 	);
 }
 
@@ -278,12 +374,44 @@ function royal_limo_setup() {
 		'footer'  => __( 'Footer Menu', 'royal-limo' ),
 	) );
 
-	add_image_size( 'fleet-card', 640, 420, true );
+	// 640x480 (4:3) matches .rl-fleet-card__media's CSS aspect-ratio
+	// exactly — keeps the server-side crop and the browser's
+	// object-fit:cover box in agreement instead of cropping twice.
+	add_image_size( 'fleet-card', 640, 480, true );
 	add_image_size( 'fleet-full', 1280, 800, true );
 	add_image_size( 'service-card', 640, 800, true );
 	add_image_size( 'blog-card', 640, 460, true );
 }
 add_action( 'after_setup_theme', 'royal_limo_setup' );
+
+/**
+ * Keep the default "Hello world!" sample post (ID 1) out of the real
+ * blog listing (/blog/, WordPress's designated Posts page) — same
+ * exclusion the homepage teaser applies via its own WP_Query args (see
+ * template-parts/blog.php). Done via pre_get_posts rather than
+ * skipping it mid-loop so pagination counts stay accurate.
+ */
+function royal_limo_exclude_default_post( $query ) {
+	if ( ! is_admin() && $query->is_main_query() && $query->is_home() ) {
+		$query->set( 'post__not_in', array( 1 ) );
+	}
+}
+add_action( 'pre_get_posts', 'royal_limo_exclude_default_post' );
+
+/**
+ * A file's mtime as its cache-busting version, instead of the static
+ * ROYAL_LIMO_VERSION constant. During active theme development, a
+ * hardcoded version string never changes as CSS/JS files are edited,
+ * so browsers that already cached an asset keep serving the stale
+ * copy indefinitely at the same ?ver= — this is exactly the "the
+ * style looks broken" symptom, and it's silent (no error, no console
+ * warning, it just quietly never re-fetches). Falls back to
+ * ROYAL_LIMO_VERSION if the file can't be found for some reason.
+ */
+function royal_limo_asset_version( $relative_path ) {
+	$file = ROYAL_LIMO_DIR . $relative_path;
+	return file_exists( $file ) ? filemtime( $file ) : ROYAL_LIMO_VERSION;
+}
 
 /**
  * Enqueue styles/scripts. Plain files, no build step, loaded in dependency order.
@@ -292,19 +420,19 @@ function royal_limo_assets() {
 	$css_dir = ROYAL_LIMO_URI . '/assets/css/';
 	$js_dir  = ROYAL_LIMO_URI . '/assets/js/';
 
-	wp_enqueue_style( 'royal-limo-base', $css_dir . 'base.css', array(), ROYAL_LIMO_VERSION );
-	wp_enqueue_style( 'royal-limo-glass', $css_dir . 'glass.css', array( 'royal-limo-base' ), ROYAL_LIMO_VERSION );
-	wp_enqueue_style( 'royal-limo-neumorph', $css_dir . 'neumorph.css', array( 'royal-limo-base' ), ROYAL_LIMO_VERSION );
-	wp_enqueue_style( 'royal-limo-layout', $css_dir . 'layout.css', array( 'royal-limo-base' ), ROYAL_LIMO_VERSION );
-	wp_enqueue_style( 'royal-limo-animations-css', $css_dir . 'animations.css', array( 'royal-limo-layout' ), ROYAL_LIMO_VERSION );
-	wp_enqueue_style( 'royal-limo-style', get_stylesheet_uri(), array( 'royal-limo-animations-css' ), ROYAL_LIMO_VERSION );
+	wp_enqueue_style( 'royal-limo-base', $css_dir . 'base.css', array(), royal_limo_asset_version( '/assets/css/base.css' ) );
+	wp_enqueue_style( 'royal-limo-glass', $css_dir . 'glass.css', array( 'royal-limo-base' ), royal_limo_asset_version( '/assets/css/glass.css' ) );
+	wp_enqueue_style( 'royal-limo-neumorph', $css_dir . 'neumorph.css', array( 'royal-limo-base' ), royal_limo_asset_version( '/assets/css/neumorph.css' ) );
+	wp_enqueue_style( 'royal-limo-layout', $css_dir . 'layout.css', array( 'royal-limo-base' ), royal_limo_asset_version( '/assets/css/layout.css' ) );
+	wp_enqueue_style( 'royal-limo-animations-css', $css_dir . 'animations.css', array( 'royal-limo-layout' ), royal_limo_asset_version( '/assets/css/animations.css' ) );
+	wp_enqueue_style( 'royal-limo-style', get_stylesheet_uri(), array( 'royal-limo-animations-css' ), royal_limo_asset_version( '/style.css' ) );
 
 	// GSAP from CDN (jsdelivr), core + ScrollTrigger only.
 	wp_enqueue_script( 'gsap', 'https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js', array(), '3.12.5', true );
 	wp_enqueue_script( 'gsap-scrolltrigger', 'https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js', array( 'gsap' ), '3.12.5', true );
 
-	wp_enqueue_script( 'royal-limo-main', $js_dir . 'main.js', array(), ROYAL_LIMO_VERSION, true );
-	wp_enqueue_script( 'royal-limo-animations', $js_dir . 'animations.js', array( 'gsap', 'gsap-scrolltrigger' ), ROYAL_LIMO_VERSION, true );
+	wp_enqueue_script( 'royal-limo-main', $js_dir . 'main.js', array(), royal_limo_asset_version( '/assets/js/main.js' ), true );
+	wp_enqueue_script( 'royal-limo-animations', $js_dir . 'animations.js', array( 'gsap', 'gsap-scrolltrigger' ), royal_limo_asset_version( '/assets/js/animations.js' ), true );
 
 	wp_localize_script( 'royal-limo-main', 'royalLimoData', array(
 		'ajaxUrl' => admin_url( 'admin-ajax.php' ),
@@ -325,9 +453,9 @@ function royal_limo_defer_scripts( $tag, $handle ) {
 add_filter( 'script_loader_tag', 'royal_limo_defer_scripts', 10, 2 );
 
 /**
- * Native block-editor sidebar panels for the Fleet/Testimonial custom
- * fields (assets/js/admin-panels.js), replacing the old classic meta
- * boxes. Only loaded on those two post types' editor screens.
+ * Native block-editor sidebar panels for the Fleet/Testimonial/Banner/
+ * Service custom fields (assets/js/admin-panels.js), replacing the old
+ * classic meta boxes. Only loaded on those post types' editor screens.
  */
 function royal_limo_admin_assets( $hook ) {
 	if ( 'post.php' !== $hook && 'post-new.php' !== $hook ) {
@@ -335,15 +463,15 @@ function royal_limo_admin_assets( $hook ) {
 	}
 
 	$screen = get_current_screen();
-	if ( ! $screen || ! in_array( $screen->post_type, array( 'fleet', 'testimonial', 'banner' ), true ) ) {
+	if ( ! $screen || ! in_array( $screen->post_type, array( 'fleet', 'testimonial', 'banner', 'service' ), true ) ) {
 		return;
 	}
 
 	wp_enqueue_script(
 		'royal-limo-admin-panels',
 		ROYAL_LIMO_URI . '/assets/js/admin-panels.js',
-		array( 'wp-plugins', 'wp-editor', 'wp-edit-post', 'wp-element', 'wp-components', 'wp-data', 'wp-i18n' ),
-		ROYAL_LIMO_VERSION,
+		array( 'wp-plugins', 'wp-editor', 'wp-edit-post', 'wp-block-editor', 'wp-element', 'wp-components', 'wp-data', 'wp-i18n' ),
+		royal_limo_asset_version( '/assets/js/admin-panels.js' ),
 		true
 	);
 }

@@ -24,22 +24,7 @@ $services_header = royal_limo_services_section();
 		<?php if ( $services_query->have_posts() ) : ?>
 			<div class="rl-grid rl-grid--3">
 				<?php while ( $services_query->have_posts() ) : $services_query->the_post(); ?>
-					<a href="<?php the_permalink(); ?>" class="rl-service-card">
-						<div class="rl-service-card__media">
-							<?php if ( has_post_thumbnail() ) : ?>
-								<?php the_post_thumbnail( 'service-card', array( 'loading' => 'lazy', 'alt' => get_the_title() ) ); ?>
-							<?php endif; ?>
-						</div>
-						<div class="rl-service-card__overlay">
-							<span class="rl-icon-tile rl-service-card__icon" aria-hidden="true">
-								<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-									<circle cx="12" cy="12" r="9"></circle>
-								</svg>
-							</span>
-							<h3 class="rl-card__title"><?php the_title(); ?></h3>
-							<p><?php the_excerpt(); ?></p>
-						</div>
-					</a>
+					<?php get_template_part( 'template-parts/service-card' ); ?>
 				<?php endwhile; wp_reset_postdata(); ?>
 			</div>
 		<?php else : ?>

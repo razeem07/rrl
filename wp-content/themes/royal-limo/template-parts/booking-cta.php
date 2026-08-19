@@ -9,8 +9,8 @@ $cta = royal_limo_booking_cta();
 ?>
 <section class="rl-booking-cta-section rl-section" id="book">
 	<div class="container">
-		<div class="rl-booking-banner rl-reveal" <?php if ( $cta['image_url'] ) : ?>style="background-image: linear-gradient(90deg, rgba(10,10,10,.88) 0%, rgba(10,10,10,.55) 45%, rgba(10,10,10,.15) 100%), url('<?php echo esc_url( $cta['image_url'] ); ?>');"<?php endif; ?>>
-			<div class="rl-booking-banner__copy">
+		<div class="rl-booking-banner" <?php if ( $cta['image_url'] ) : ?>style="background-image: linear-gradient(90deg, rgba(10,10,10,.88) 0%, rgba(10,10,10,.55) 45%, rgba(10,10,10,.15) 100%), url('<?php echo esc_url( $cta['image_url'] ); ?>');"<?php endif; ?>>
+			<div class="rl-booking-banner__copy rl-reveal">
 				<span class="rl-pill-badge">
 					<span class="rl-pill-badge__dot" aria-hidden="true"></span>
 					<?php echo esc_html( $cta['eyebrow'] ); ?>

@@ -530,7 +530,8 @@ a.rl-card:hover {
 	margin-bottom: 0.35rem;
 }
 
-/* ---- Services: full-bleed photo card with a frosted overlay panel ---- */
+/* ---- Services: full-bleed photo card, title-only at rest, full
+   overlay (icon + excerpt + CTA) revealed on hover. ---- */
 .rl-service-card {
 	position: relative;
 	display: block;
@@ -544,7 +545,7 @@ a.rl-card:hover {
 
 .rl-service-card:hover {
 	transform: translateY(-4px);
-	box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45);
+	box-shadow: 0 20px 48px rgba(0, 0, 0, 0.5);
 }
 
 .rl-service-card__media {
@@ -556,40 +557,144 @@ a.rl-card:hover {
 	width: 100%;
 	height: 100%;
 	object-fit: cover;
-	transition: transform var(--transition-med);
+	transition: transform 0.6s ease;
 }
 
 .rl-service-card:hover .rl-service-card__media img {
 	transform: scale(1.08);
 }
 
-.rl-service-card__overlay {
+/* Fallback look for services that don't have a featured image yet —
+   a subtle gold-tinted gradient with a faint ring motif, so the card
+   still reads as intentional rather than an empty box. */
+.rl-service-card--no-image .rl-service-card__media::before {
+	content: '';
+	position: absolute;
+	inset: 0;
+	background-image: radial-gradient(circle at 25% 15%, rgba(201, 162, 75, 0.16), transparent 55%);
+}
+
+.rl-service-card--no-image .rl-service-card__media::after {
+	content: '';
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	width: 65%;
+	max-width: 220px;
+	aspect-ratio: 1;
+	transform: translate(-50%, -50%);
+	border: 1.5px solid rgba(201, 162, 75, 0.18);
+	border-radius: 50%;
+}
+
+/* Small "view" badge, always visible, top-right corner. */
+.rl-service-card__arrow {
+	position: absolute;
+	top: var(--space-sm);
+	right: var(--space-sm);
+	width: 38px;
+	height: 38px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	border-radius: 50%;
+	background: rgba(10, 10, 10, 0.45);
+	border: 1px solid rgba(255, 255, 255, 0.16);
+	backdrop-filter: blur(6px);
+	-webkit-backdrop-filter: blur(6px);
+	color: var(--text-light);
+	transition: background var(--transition-med), border-color var(--transition-med), transform var(--transition-med), color var(--transition-med);
+}
+
+.rl-service-card:hover .rl-service-card__arrow {
+	background: var(--gold);
+	border-color: var(--gold);
+	color: var(--bg-black);
+	transform: rotate(45deg);
+}
+
+/* Base state: just enough gradient for the title to stay legible. */
+.rl-service-card__base {
 	position: absolute;
 	left: 0;
 	right: 0;
 	bottom: 0;
 	padding: var(--space-md);
-	background: linear-gradient(180deg, rgba(10, 10, 10, 0) 0%, rgba(10, 10, 10, 0.55) 35%, rgba(8, 8, 8, 0.88) 100%);
-	backdrop-filter: blur(10px);
-	-webkit-backdrop-filter: blur(10px);
-	transition: padding-bottom var(--transition-med);
+	background: linear-gradient(180deg, rgba(8, 8, 8, 0) 0%, rgba(8, 8, 8, 0.8) 100%);
+	transition: opacity var(--transition-med);
+}
+
+.rl-service-card__base .rl-card__title {
+	margin: 0;
+	color: var(--text-light);
+}
+
+.rl-service-card:hover .rl-service-card__base {
+	opacity: 0;
+}
+
+/* Hover overlay: full dark tint + icon/title/excerpt/CTA, staggered in. */
+.rl-service-card__overlay {
+	position: absolute;
+	inset: 0;
+	display: flex;
+	flex-direction: column;
+	justify-content: flex-end;
+	padding: var(--space-lg) var(--space-md);
+	background: linear-gradient(180deg, rgba(8, 8, 8, 0.15) 0%, rgba(8, 8, 8, 0.72) 45%, rgba(6, 6, 6, 0.94) 100%);
+	opacity: 0;
+	transition: opacity var(--transition-med);
 }
 
 .rl-service-card:hover .rl-service-card__overlay {
-	padding-bottom: calc(var(--space-md) + 0.4rem);
+	opacity: 1;
 }
+
+.rl-service-card__overlay > * {
+	opacity: 0;
+	transform: translateY(14px);
+	transition: opacity var(--transition-med), transform var(--transition-med);
+}
+
+.rl-service-card:hover .rl-service-card__overlay > * {
+	opacity: 1;
+	transform: translateY(0);
+}
+
+.rl-service-card:hover .rl-service-card__overlay > *:nth-child(2) { transition-delay: 0.03s; }
+.rl-service-card:hover .rl-service-card__overlay > *:nth-child(3) { transition-delay: 0.06s; }
+.rl-service-card:hover .rl-service-card__overlay > *:nth-child(4) { transition-delay: 0.09s; }
 
 .rl-service-card__icon {
 	margin-bottom: var(--space-sm);
 }
 
 .rl-service-card__overlay .rl-card__title {
+	margin-bottom: 0.5rem;
 	color: var(--text-light);
 }
 
 .rl-service-card__overlay p {
-	margin: 0;
+	margin: 0 0 var(--space-sm);
 	font-size: 0.9rem;
+	color: var(--text-muted);
+}
+
+.rl-service-card__cta {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.4rem;
+	font-size: 0.85rem;
+	font-weight: 600;
+	color: var(--gold);
+}
+
+.rl-service-card__cta svg {
+	transition: transform var(--transition-med);
+}
+
+.rl-service-card:hover .rl-service-card__cta svg {
+	transform: translate(3px, -3px);
 }
 
 /* ---- Fleet ---- */
@@ -637,6 +742,40 @@ a.rl-card:hover {
 
 .rl-fleet__view-all:hover svg {
 	transform: translateX(4px);
+}
+
+/* ---- Category filter tabs (Fleet section/archive) ---- */
+.rl-filter-tabs {
+	display: flex;
+	flex-wrap: wrap;
+	gap: var(--space-xs);
+	margin-bottom: var(--space-lg);
+}
+
+.rl-filter-tabs__btn,
+.rl-filter-tabs__link {
+	padding: 0.55rem 1.15rem;
+	border: 1px solid var(--glass-border);
+	border-radius: var(--radius-pill);
+	background: transparent;
+	color: var(--text-muted);
+	font-weight: 600;
+	font-size: 0.85rem;
+	white-space: nowrap;
+	transition: background var(--transition-fast), color var(--transition-fast), border-color var(--transition-fast);
+}
+
+.rl-filter-tabs__btn:hover,
+.rl-filter-tabs__link:hover {
+	color: var(--text-light);
+	border-color: var(--gold);
+}
+
+.rl-filter-tabs__btn.is-active,
+.rl-filter-tabs__link.is-active {
+	background: linear-gradient(135deg, var(--gold-soft), var(--gold));
+	border-color: transparent;
+	color: var(--bg-black);
 }
 
 /* ---- Fleet cards ---- */
@@ -954,6 +1093,27 @@ a.rl-card:hover {
 	background-size: cover;
 	background-position: center;
 	box-shadow: 0 24px 48px rgba(0, 0, 0, 0.45);
+}
+
+/* Silent autoplay preview injected by main.js once the card scrolls
+   into view (see [data-rl-video-bg]) — sits above the poster background-
+   image but below the play button/marquee. The poster stays in place
+   underneath, so nothing breaks if autoplay is blocked/skipped
+   (prefers-reduced-motion, no IntersectionObserver support, etc). */
+.rl-video-card__bg {
+	position: absolute;
+	inset: 0;
+	z-index: 0;
+	overflow: hidden;
+	pointer-events: none;
+}
+
+.rl-video-card__bg video,
+.rl-video-card__bg iframe {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	border: none;
 }
 
 .rl-video-card__play {
@@ -1452,6 +1612,72 @@ body.rl-modal-open {
 	margin: 0;
 }
 
+/* ---- Contact Form 7 integration ----
+   The .rl-quote-form/.rl-quote-form__row/.rl-input classes above are
+   applied directly to CF7's own tags (see the form created for
+   royal_limo_quote_shortcode), so the grid/spacing rules already
+   match. CF7 additionally wraps every field in its own
+   .wpcf7-form-control-wrap span and injects a response banner after
+   submit — those need their own rules since they're not part of our
+   markup. */
+.wpcf7-form-control-wrap {
+	display: block;
+	width: 100%;
+}
+
+.wpcf7-not-valid-tip {
+	display: block;
+	margin-top: 0.35rem;
+	color: #ff8080;
+	font-size: 0.8rem;
+}
+
+/* CF7's a11y live-region — hidden visually like WP core's .screen-reader-text,
+   otherwise it renders as a visible empty box above the form fields. */
+.screen-reader-response {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	overflow: hidden;
+	clip: rect(1px, 1px, 1px, 1px);
+	white-space: nowrap;
+}
+
+.wpcf7-response-output {
+	margin: var(--space-sm) 0 0 !important;
+	padding: 0.75rem 1rem !important;
+	border-radius: var(--radius-sm) !important;
+	border: 1px solid var(--glass-border) !important;
+	color: var(--text-light);
+	font-size: 0.9rem;
+}
+
+.wpcf7-response-output:empty {
+	display: none;
+}
+
+/* CF7 wraps its hidden nonce/meta fields in a <fieldset>, which the
+   browser renders with a default border+padding once CF7's own
+   stylesheet is disabled (we style everything else ourselves). */
+.hidden-fields-container {
+	display: none;
+}
+
+.wpcf7-mail-sent-ok {
+	border-color: #4caf7d !important;
+	color: #8fe3b8;
+}
+
+.wpcf7-validation-errors,
+.wpcf7-mail-sent-ng {
+	border-color: #e05656 !important;
+	color: #ff9d9d;
+}
+
+.wpcf7-spinner {
+	margin-left: 0.5rem;
+}
+
 /* ---- Footer ---- */
 .site-footer {
 	background: var(--bg-black-soft);
@@ -1710,6 +1936,20 @@ a.rl-reviews-badge:hover .rl-reviews-badge__count {
 	height: auto;
 }
 
+.rl-single-fleet__categories {
+	margin-top: -0.5rem;
+}
+
+.rl-single-fleet__categories a {
+	color: var(--gold);
+	font-weight: 600;
+	font-size: 0.85rem;
+}
+
+.rl-single-fleet__categories a:hover {
+	text-decoration: underline;
+}
+
 .rl-single-fleet__specs {
 	margin-bottom: var(--space-md);
 }
@@ -1723,6 +1963,774 @@ a.rl-reviews-badge:hover .rl-reviews-badge__count {
 .rl-single-fleet .rl-page__content,
 .rl-single-service .rl-page__content {
 	margin-bottom: var(--space-lg);
+}
+
+/* ---- Page header banner (single service) ---- */
+/* Full-bleed: no .container wrapper for this section (same pattern as
+   .rl-video-showcase__panel) — spans the full viewport width edge-to-
+   edge, no border-radius since it's flush with the browser edges
+   rather than inset like every other panel. Inner text content is
+   centered/width-capped via .rl-page-header__inner instead. */
+.rl-page-header {
+	position: relative;
+	overflow: hidden;
+	padding: var(--space-2xl) var(--space-md);
+	text-align: center;
+	background-color: var(--bg-black-soft);
+	background-image: linear-gradient(180deg, rgba(10, 10, 10, .55) 0%, rgba(10, 10, 10, .8) 100%);
+	background-size: cover;
+	background-position: center;
+}
+
+.rl-page-header__inner {
+	max-width: 900px;
+	margin-inline: auto;
+}
+
+.rl-page-header h1 {
+	color: var(--text-light);
+	margin: 0 0 var(--space-sm);
+}
+
+/* Blog post titles run noticeably longer than a service/vehicle name
+   — the shared h1 size wrapped to 3 lines, so this page gets a
+   smaller cap rather than shrinking the banner heading everywhere. */
+.rl-page-header--blog h1 {
+	font-size: clamp(1.75rem, 2.5vw + 1rem, 2.75rem);
+}
+
+.rl-breadcrumb {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.4rem;
+	padding: 0.4rem 1rem;
+	border-radius: var(--radius-pill);
+	background: var(--glass-bg-strong);
+	border: 1px solid var(--glass-border);
+	font-size: 0.8rem;
+	color: var(--text-muted);
+}
+
+.rl-breadcrumb a {
+	color: var(--text-muted);
+}
+
+.rl-breadcrumb a:hover {
+	color: var(--gold);
+}
+
+.rl-breadcrumb__current {
+	color: var(--text-light);
+}
+
+/* ---- Service detail: sidebar + main two-column layout ---- */
+.rl-service-detail__layout {
+	display: grid;
+	grid-template-columns: 280px 1fr;
+	gap: var(--space-xl);
+	align-items: start;
+}
+
+.rl-service-sidebar {
+	position: sticky;
+	top: calc(var(--space-md) + 80px);
+	display: flex;
+	flex-direction: column;
+	gap: var(--space-md);
+}
+
+.rl-service-sidebar__list-card {
+	overflow: hidden;
+	background: var(--surface);
+	border-radius: var(--radius-md);
+}
+
+.rl-service-sidebar__list-header {
+	padding: 0.9rem var(--space-md);
+	background: linear-gradient(135deg, var(--gold-soft), var(--gold));
+	color: var(--bg-black);
+	font-weight: 700;
+	font-size: 0.95rem;
+}
+
+.rl-service-sidebar__list {
+	list-style: none;
+	margin: 0;
+	padding: 0.4rem 0;
+}
+
+.rl-service-sidebar__list li + li {
+	border-top: 1px solid var(--glass-border);
+}
+
+.rl-service-sidebar__list a {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: var(--space-sm);
+	padding: 0.75rem var(--space-md);
+	font-size: 0.9rem;
+	font-weight: 600;
+	color: var(--text-muted);
+	transition: color var(--transition-fast);
+}
+
+.rl-service-sidebar__list a svg {
+	flex: 0 0 auto;
+	opacity: 0;
+	transform: translateX(-4px);
+	transition: opacity var(--transition-fast), transform var(--transition-fast);
+}
+
+.rl-service-sidebar__list a:hover,
+.rl-service-sidebar__list a.is-active {
+	color: var(--gold);
+}
+
+.rl-service-sidebar__list a:hover svg,
+.rl-service-sidebar__list a.is-active svg {
+	opacity: 1;
+	transform: translateX(0);
+}
+
+.rl-service-sidebar__card {
+	padding: var(--space-md);
+	background: var(--surface);
+	border-radius: var(--radius-md);
+}
+
+.rl-service-sidebar__phone {
+	display: flex;
+	align-items: center;
+	gap: var(--space-sm);
+	padding: var(--space-md);
+	border-radius: var(--radius-md);
+	background: linear-gradient(135deg, var(--gold-soft), var(--gold));
+	color: var(--bg-black);
+	font-weight: 700;
+}
+
+.rl-service-sidebar__phone svg {
+	flex: 0 0 auto;
+}
+
+.rl-service-detail__media {
+	position: relative;
+	overflow: hidden;
+	border-radius: var(--radius-lg);
+	margin-bottom: var(--space-lg);
+	/* Capped aspect-ratio instead of the image's own natural height —
+	   without this, a portrait-oriented photo stretched to the full
+	   content column width rendered enormously tall. */
+	aspect-ratio: 16 / 9;
+}
+
+.rl-service-detail__media img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	display: block;
+}
+
+.rl-service-detail__media .rl-btn {
+	position: absolute;
+	right: var(--space-md);
+	bottom: var(--space-md);
+}
+
+.rl-service-detail__section {
+	margin-bottom: var(--space-xl);
+}
+
+.rl-service-detail__section h2 {
+	margin-bottom: var(--space-sm);
+}
+
+.rl-service-detail__checklist {
+	display: grid;
+	grid-template-columns: repeat(2, 1fr);
+	gap: 0.75rem var(--space-md);
+	margin-top: var(--space-md);
+}
+
+.rl-service-detail__check {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	font-weight: 600;
+	font-size: 0.92rem;
+}
+
+.rl-service-detail__check svg {
+	flex: 0 0 auto;
+	color: var(--gold);
+}
+
+.rl-feature-card {
+	padding: var(--space-lg) var(--space-md);
+	text-align: center;
+	background: var(--surface);
+	border-radius: var(--radius-md);
+	transition: transform var(--transition-fast);
+}
+
+.rl-feature-card:hover {
+	transform: translateY(-3px);
+}
+
+.rl-feature-card .rl-icon-tile {
+	margin-inline: auto;
+	margin-bottom: var(--space-sm);
+	color: var(--gold);
+}
+
+.rl-feature-card .rl-card__title {
+	margin: 0;
+	font-size: 1rem;
+}
+
+/* ---- Service booking process ---- */
+.rl-service-process__layout {
+	display: grid;
+	grid-template-columns: 1fr;
+	max-width: 720px;
+	margin-inline: auto;
+	gap: var(--space-xl);
+	align-items: center;
+}
+
+.rl-service-process__steps {
+	display: flex;
+	flex-direction: column;
+}
+
+.rl-service-process__step {
+	display: flex;
+	gap: var(--space-md);
+	padding-block: var(--space-md);
+}
+
+.rl-service-process__step + .rl-service-process__step {
+	border-top: 1px solid var(--glass-border);
+}
+
+.rl-service-process__step .rl-icon-tile {
+	flex: 0 0 auto;
+	color: var(--gold);
+	font-size: 1rem;
+}
+
+.rl-service-process__step h3 {
+	margin: 0 0 0.3rem;
+	font-size: 1.05rem;
+}
+
+.rl-service-process__step p {
+	margin: 0;
+	color: var(--text-muted);
+	font-size: 0.9rem;
+}
+
+@media (max-width: 900px) {
+	.rl-service-detail__layout {
+		grid-template-columns: 1fr;
+	}
+
+	.rl-service-sidebar {
+		position: static;
+		flex-direction: row;
+		flex-wrap: wrap;
+	}
+
+	.rl-service-sidebar__list-card,
+	.rl-service-sidebar__card,
+	.rl-service-sidebar__phone {
+		flex: 1 1 240px;
+	}
+}
+
+@media (max-width: 600px) {
+	.rl-service-detail__checklist {
+		grid-template-columns: 1fr;
+	}
+}
+
+/* ---- Fleet detail page (single-fleet.php) ---- */
+/* Reuses the .rl-service-detail__layout / .rl-service-sidebar* / .rl-page__content
+   structural classes built for single-service.php as-is — same two-
+   column layout, same sidebar card treatment, same FAQ accordion. */
+
+.rl-fleet-price {
+	display: flex;
+	align-items: baseline;
+	gap: 0.4rem;
+	margin-bottom: var(--space-md);
+}
+
+.rl-fleet-price__amount {
+	font-family: var(--font-heading);
+	font-size: 2rem;
+	font-weight: 700;
+	color: var(--gold);
+	line-height: 1;
+}
+
+.rl-fleet-price__unit {
+	color: var(--text-muted);
+	font-size: 0.85rem;
+}
+
+.rl-fleet-specs-list {
+	list-style: none;
+	margin: 0 0 var(--space-md);
+	padding: 0;
+	display: flex;
+	flex-direction: column;
+	gap: 0.65rem;
+}
+
+.rl-fleet-specs-list li {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: var(--space-sm);
+	font-size: 0.9rem;
+	color: var(--text-muted);
+	padding-bottom: 0.65rem;
+	border-bottom: 1px solid var(--glass-border);
+}
+
+.rl-fleet-specs-list li:last-child {
+	border-bottom: none;
+	padding-bottom: 0;
+}
+
+.rl-fleet-specs-list li span {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.5rem;
+}
+
+.rl-fleet-specs-list li svg {
+	color: var(--gold);
+	flex: 0 0 auto;
+}
+
+.rl-fleet-specs-list li strong {
+	color: var(--text-light);
+}
+
+.rl-fleet-gallery {
+	position: relative;
+	border-radius: var(--radius-lg);
+	overflow: hidden;
+	aspect-ratio: 16 / 9;
+	background-color: var(--surface);
+	margin-bottom: var(--space-lg);
+}
+
+.rl-fleet-gallery__track {
+	display: flex;
+	width: 100%;
+	height: 100%;
+	transition: transform var(--transition-med);
+}
+
+.rl-fleet-gallery__slide {
+	flex: 0 0 100%;
+	background-size: cover;
+	background-position: center;
+}
+
+.rl-fleet-gallery__dots {
+	position: absolute;
+	bottom: var(--space-sm);
+	left: 50%;
+	transform: translateX(-50%);
+	display: flex;
+	gap: 0.4rem;
+	z-index: 2;
+}
+
+.rl-fleet-gallery__dot {
+	width: 8px;
+	height: 8px;
+	border-radius: var(--radius-pill);
+	background: rgba(255, 255, 255, 0.45);
+	border: none;
+	padding: 0;
+	transition: width var(--transition-fast), background var(--transition-fast);
+}
+
+.rl-fleet-gallery__dot.is-active {
+	width: 22px;
+	background: var(--gold);
+}
+
+/* ---- Blog detail page (single.php) ---- */
+.rl-blog-detail__layout {
+	display: grid;
+	grid-template-columns: 1fr 320px;
+	gap: var(--space-xl);
+	align-items: start;
+}
+
+.rl-blog-detail__sidebar {
+	position: sticky;
+	top: calc(var(--space-md) + 80px);
+}
+
+.rl-blog-sidebar__list {
+	list-style: none;
+	margin: 0;
+	padding: 0.4rem;
+}
+
+.rl-blog-sidebar__item {
+	display: flex;
+	align-items: center;
+	gap: var(--space-sm);
+	padding: 0.6rem;
+	border-radius: var(--radius-sm);
+	transition: background var(--transition-fast);
+}
+
+.rl-blog-sidebar__item:hover {
+	background: rgba(255, 255, 255, 0.04);
+}
+
+.rl-blog-sidebar__thumb {
+	flex: 0 0 auto;
+	width: 64px;
+	height: 64px;
+	border-radius: var(--radius-sm);
+	overflow: hidden;
+	background: var(--bg-black-soft);
+}
+
+.rl-blog-sidebar__thumb img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	display: block;
+}
+
+.rl-blog-sidebar__title {
+	font-size: 0.88rem;
+	font-weight: 600;
+	line-height: 1.4;
+	color: var(--text-light);
+}
+
+.rl-single-post__date {
+	color: var(--gold);
+	font-weight: 600;
+	font-size: 0.8rem;
+	text-transform: uppercase;
+	letter-spacing: 0.04em;
+	margin-bottom: var(--space-sm);
+}
+
+@media (max-width: 900px) {
+	.rl-blog-detail__layout {
+		grid-template-columns: 1fr;
+	}
+
+	.rl-blog-detail__sidebar {
+		position: static;
+	}
+}
+
+/* ---- Contact page (page-contact.php) ---- */
+.rl-contact__layout {
+	display: grid;
+	grid-template-columns: 1fr 1.3fr;
+	gap: var(--space-xl);
+	align-items: start;
+}
+
+.rl-contact__info h3 {
+	margin-bottom: var(--space-sm);
+}
+
+.rl-contact-info-list {
+	display: flex;
+	flex-direction: column;
+	gap: var(--space-md);
+	padding-top: var(--space-md);
+	border-top: 1px solid var(--glass-border);
+}
+
+.rl-contact-info-item {
+	display: flex;
+	align-items: center;
+	gap: var(--space-sm);
+}
+
+.rl-contact-info-item__icon {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex: 0 0 auto;
+	width: 44px;
+	height: 44px;
+	border-radius: 50%;
+	background: linear-gradient(135deg, var(--gold-soft), var(--gold));
+	color: var(--bg-black);
+}
+
+.rl-contact-info-item__label {
+	display: block;
+	font-size: 0.8rem;
+	color: var(--text-muted);
+}
+
+.rl-contact-info-item__value {
+	display: block;
+	font-weight: 700;
+	color: var(--text-light);
+}
+
+.rl-contact-info-item__value:hover {
+	color: var(--gold);
+}
+
+.rl-contact__form-card {
+	background: var(--surface);
+	border-radius: var(--radius-lg);
+	padding: var(--space-lg);
+}
+
+.rl-contact__form-card h2 {
+	margin-top: var(--space-sm);
+}
+
+.rl-contact__form-card > p {
+	max-width: 56ch;
+	margin-bottom: var(--space-md);
+}
+
+.rl-contact__form-card .rl-quote-form {
+	padding: 0;
+	background: none;
+	border: none;
+	backdrop-filter: none;
+	-webkit-backdrop-filter: none;
+	box-shadow: none;
+}
+
+@media (max-width: 900px) {
+	.rl-contact__layout {
+		grid-template-columns: 1fr;
+	}
+}
+
+/* ---- Shared media fallback (used where a photo slot may be empty) ---- */
+.rl-media-fallback {
+	position: relative;
+	background: linear-gradient(160deg, var(--surface), var(--bg-black-soft));
+}
+
+.rl-media-fallback::before {
+	content: '';
+	position: absolute;
+	inset: 0;
+	background-image: radial-gradient(circle at 25% 15%, rgba(201, 162, 75, 0.16), transparent 55%);
+}
+
+.rl-media-fallback::after {
+	content: '';
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	width: 55%;
+	max-width: 200px;
+	aspect-ratio: 1;
+	transform: translate(-50%, -50%);
+	border: 1.5px solid rgba(201, 162, 75, 0.18);
+	border-radius: 50%;
+}
+
+/* ---- About page: Our Approach ---- */
+.rl-approach__layout {
+	align-items: center;
+}
+
+.rl-approach__copy .rl-eyebrow {
+	margin-bottom: 0;
+}
+
+.rl-approach__copy h2 {
+	margin-top: 0.35rem;
+	margin-bottom: var(--space-lg);
+}
+
+.rl-approach__block {
+	margin-bottom: var(--space-lg);
+}
+
+.rl-approach__block:last-child {
+	margin-bottom: 0;
+}
+
+.rl-approach__block .rl-icon-tile {
+	margin-bottom: var(--space-sm);
+}
+
+.rl-approach__block h3 {
+	font-size: 1.2rem;
+	margin-bottom: 0.6rem;
+}
+
+.rl-approach__list {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	display: flex;
+	flex-direction: column;
+	gap: 0.5rem;
+}
+
+.rl-approach__list li {
+	display: flex;
+	align-items: flex-start;
+	gap: 0.6rem;
+	color: var(--text-muted);
+}
+
+.rl-approach__list svg {
+	flex: 0 0 auto;
+	margin-top: 0.2rem;
+	color: var(--gold);
+}
+
+.rl-approach__media {
+	aspect-ratio: 4 / 5;
+	border-radius: var(--radius-lg);
+	overflow: hidden;
+}
+
+.rl-approach__media img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	display: block;
+}
+
+/* ---- About page: What We Do ---- */
+.rl-what-we-do__layout {
+	align-items: center;
+}
+
+.rl-what-we-do__media {
+	aspect-ratio: 4 / 5;
+	border-radius: var(--radius-lg);
+	overflow: hidden;
+}
+
+.rl-what-we-do__media img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	display: block;
+}
+
+.rl-what-we-do__copy .rl-eyebrow {
+	margin-bottom: 0;
+}
+
+.rl-what-we-do__copy h2 {
+	margin-top: 0.35rem;
+}
+
+.rl-what-we-do__description {
+	color: var(--text-muted);
+	max-width: 52ch;
+	margin-bottom: var(--space-lg);
+}
+
+.rl-what-we-do__features {
+	display: grid;
+	grid-template-columns: repeat(2, 1fr);
+	gap: var(--space-lg) var(--space-md);
+}
+
+.rl-what-we-do__feature .rl-icon-tile {
+	margin-bottom: var(--space-sm);
+}
+
+.rl-what-we-do__feature h4 {
+	font-size: 1rem;
+	margin-bottom: 0.3rem;
+}
+
+.rl-what-we-do__feature p {
+	margin: 0;
+	font-size: 0.88rem;
+	color: var(--text-muted);
+}
+
+/* ---- About page: Key Persons (team) ---- */
+.rl-team-card__media {
+	position: relative;
+	aspect-ratio: 4 / 5;
+	border-radius: var(--radius-lg);
+	overflow: hidden;
+	background: linear-gradient(160deg, var(--surface), var(--bg-black-soft));
+	margin-bottom: var(--space-sm);
+}
+
+.rl-team-card__media img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	display: block;
+}
+
+.rl-team-card__initial {
+	position: absolute;
+	inset: 0;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-family: var(--font-heading);
+	font-size: 3.5rem;
+	font-weight: 700;
+	color: var(--gold);
+	opacity: 0.5;
+}
+
+.rl-team-card__socials {
+	position: absolute;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	display: flex;
+	justify-content: center;
+	gap: 0.5rem;
+	padding: var(--space-sm);
+	background: linear-gradient(180deg, rgba(8, 8, 8, 0) 0%, rgba(8, 8, 8, 0.75) 100%);
+	opacity: 0;
+	transform: translateY(8px);
+	transition: opacity var(--transition-med), transform var(--transition-med);
+}
+
+.rl-team-card:hover .rl-team-card__socials {
+	opacity: 1;
+	transform: translateY(0);
+}
+
+.rl-team-card__socials .rl-icon-tile {
+	width: 34px;
+	height: 34px;
+	font-size: 0.75rem;
+}
+
+.rl-team-card__role {
+	margin: 0;
+	color: var(--gold);
+	font-size: 0.85rem;
+	font-weight: 600;
 }
 
 /* ==========================================================================
@@ -1831,6 +2839,10 @@ a.rl-reviews-badge:hover .rl-reviews-badge__count {
 	.rl-grid--3,
 	.rl-grid--2,
 	.rl-post-grid {
+		grid-template-columns: 1fr;
+	}
+
+	.rl-what-we-do__features {
 		grid-template-columns: 1fr;
 	}
 

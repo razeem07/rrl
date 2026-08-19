@@ -61,10 +61,6 @@ function royal_limo_quote_form( $variant = 'compact' ) {
 		<button type="submit" class="rl-btn rl-btn--neu rl-btn--gold rl-quote-form__submit">
 			<?php esc_html_e( 'Get a Quote', 'royal-limo' ); ?>
 		</button>
-
-		<p class="rl-quote-form__note">
-			<?php esc_html_e( 'Booking form placeholder — connect Contact Form 7 via Customizer › Contact Info to activate submissions.', 'royal-limo' ); ?>
-		</p>
 	</form>
 	<?php
 }
