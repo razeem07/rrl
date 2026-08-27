@@ -1,9 +1,12 @@
 <?php
 /**
  * Hero banner carousel — pulls from the "banner" CPT (admin-only, wp-admin
- * managed). Falls back to a single static slide built from Customizer
- * values when no banners have been added yet, so the homepage never
- * ships an empty hero.
+ * managed). Falls back to a single static slide with hardcoded copy when
+ * no banners have been added yet, so the homepage never ships an empty
+ * hero. (That fallback text used to be Customizer fields — Hero Heading/
+ * Subheading/Background Image — but those were removed once the banner
+ * CPT became the real content source; they only ever fed this one
+ * empty-state slide.)
  */
 $banner_query = new WP_Query( array(
 	'post_type'      => 'banner',
@@ -35,8 +38,8 @@ if ( $banner_query->have_posts() ) {
 } else {
 	$slides[] = array(
 		'eyebrow'     => ROYAL_LIMO_DEFAULT_EYEBROW,
-		'title'       => get_theme_mod( 'royal_limo_hero_heading', 'Arrive in Absolute Style' ),
-		'description' => get_theme_mod( 'royal_limo_hero_subheading', ROYAL_LIMO_DEFAULT_HERO_SUBHEADING ),
+		'title'       => 'Arrive in Absolute Style',
+		'description' => ROYAL_LIMO_DEFAULT_HERO_SUBHEADING,
 		'image_url'   => '',
 		'cta1_label'  => __( 'Get a Quote', 'royal-limo' ),
 		'cta1_url'    => royal_limo_booking_url(),

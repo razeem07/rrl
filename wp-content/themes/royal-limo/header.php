@@ -56,11 +56,17 @@
 			</a>
 		</nav>
 
-		<a href="<?php echo esc_url( royal_limo_booking_url() ); ?>" class="rl-btn rl-btn--neu rl-btn--gold rl-btn--icon-left primary-nav__cta">
-			<span class="rl-btn__icon" aria-hidden="true">
-				<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+		<a href="<?php echo esc_attr( royal_limo_phone_href( get_theme_mod( 'royal_limo_phone', ROYAL_LIMO_DEFAULT_PHONE ) ) ); ?>" class="primary-nav__hotline" aria-label="<?php esc_attr_e( 'Call our 24/7 hotline', 'royal-limo' ); ?>">
+			<span class="primary-nav__hotline-icon" aria-hidden="true">
+				<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+					<path d="M3 18v-6a9 9 0 0118 0v6"/>
+					<path d="M21 19a2 2 0 01-2 2h-1a2 2 0 01-2-2v-3a2 2 0 012-2h3zM3 19a2 2 0 002 2h1a2 2 0 002-2v-3a2 2 0 00-2-2H3z"/>
+				</svg>
 			</span>
-			<?php esc_html_e( 'Get Started', 'royal-limo' ); ?>
+			<span class="primary-nav__hotline-text">
+				<span class="primary-nav__hotline-label"><?php esc_html_e( '24/7 Hotline', 'royal-limo' ); ?></span>
+				<span class="primary-nav__hotline-number"><?php echo esc_html( get_theme_mod( 'royal_limo_phone', ROYAL_LIMO_DEFAULT_PHONE ) ); ?></span>
+			</span>
 		</a>
 	</div>
 </header>

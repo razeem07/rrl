@@ -8,7 +8,7 @@
 	justify-content: center;
 	gap: 0.5rem;
 	padding: 0.85rem 1.75rem;
-	border: none;
+	border: 1.5px solid transparent;
 	border-radius: var(--radius-pill);
 	font-weight: 600;
 	font-size: 0.95rem;
@@ -17,11 +17,12 @@
 	box-shadow:
 		6px 6px 12px var(--neu-dark),
 		-6px -6px 12px var(--neu-light);
-	transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+	transition: transform var(--transition-fast), box-shadow var(--transition-fast), border-color var(--transition-fast);
 }
 
 .rl-btn:hover {
 	transform: translateY(-2px);
+	border-color: var(--gold);
 	box-shadow:
 		8px 8px 16px var(--neu-dark),
 		-8px -8px 16px var(--neu-light);
@@ -37,6 +38,13 @@
 .rl-btn--gold {
 	color: var(--bg-black);
 	background: linear-gradient(135deg, var(--gold-soft), var(--gold));
+}
+
+/* A gold border wouldn't read against the gold fill itself, so the
+   filled variant gets a dark border on hover instead — same "outline
+   appears on hover" idea, just recoloured for contrast. */
+.rl-btn--gold:hover {
+	border-color: var(--bg-black);
 }
 
 .rl-btn--sm {

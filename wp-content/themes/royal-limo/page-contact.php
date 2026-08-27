@@ -5,15 +5,21 @@
  * Full-bleed hero banner (title + breadcrumb), a two-column section
  * (contact info on the left, booking form card on the right), then
  * the "Where We Serve" section and a map embed for service areas.
+ * Banner image is set directly on this page (sidebar panel — see
+ * assets/js/admin-panels.js and royal_limo_register_contact_page_meta()
+ * in inc/custom-post-types.php), not the Customizer, since this is a
+ * real editable page.
  */
 get_header();
 
 $phone   = get_theme_mod( 'royal_limo_phone', ROYAL_LIMO_DEFAULT_PHONE );
 $email   = get_theme_mod( 'royal_limo_email', '' );
 $address = get_theme_mod( 'royal_limo_address', '' );
+
+$contact_banner_image = get_post_meta( get_the_ID(), '_contact_banner_image', true );
 ?>
 
-<section class="rl-page-header rl-reveal">
+<section class="rl-page-header rl-reveal" <?php if ( $contact_banner_image ) : ?>style="background-image: url('<?php echo esc_url( $contact_banner_image ); ?>');"<?php endif; ?>>
 	<div class="rl-page-header__inner">
 		<h1><?php the_title(); ?></h1>
 		<nav class="rl-breadcrumb" aria-label="<?php esc_attr_e( 'Breadcrumb', 'royal-limo' ); ?>">

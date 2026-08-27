@@ -7,8 +7,14 @@
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
-	gap: var(--space-sm);
+	gap: var(--space-md);
 	padding-block: var(--space-sm);
+	/* Wider and with more breathing room at the edges than the standard
+	   .container (1200px / --space-md) it's also applied with in
+	   header.php — this override only widens the header bar itself,
+	   not every other section's content width. */
+	max-width: 1320px;
+	padding-inline: 2rem;
 }
 
 .site-branding {
@@ -55,7 +61,11 @@
 
 .rl-logo__word {
 	flex: 1 1 auto;
-	min-width: 0;
+	/* Shrinks with the available space (needed for the ellipsis below to
+	   work in a flex context at all) but keeps a readable floor instead
+	   of squeezing away to nothing once .primary-nav/.primary-nav__hotline
+	   claim their (now larger, flex-shrink:0) share of the header. */
+	min-width: 6ch;
 	font-family: var(--font-heading);
 	font-size: clamp(1.05rem, 2.5vw, 1.4rem);
 	font-weight: 700;
@@ -86,12 +96,18 @@
 	display: flex;
 	align-items: center;
 	gap: var(--space-lg);
+	/* Never shrink below the nav links' natural (nowrap) width — without
+	   this, flexbox's default shrink behavior squeezes this container
+	   first and the nowrap text inside spills out over the hotline pill
+	   next to it. .site-branding already has its own ellipsis-truncation
+	   handling for exactly this squeeze, so let it absorb it instead. */
+	flex-shrink: 0;
 }
 
 .primary-nav__list {
 	display: flex;
 	align-items: center;
-	gap: var(--space-md);
+	gap: 1.85rem;
 }
 
 .primary-nav__list li {
@@ -106,6 +122,7 @@
 	font-weight: 500;
 	font-size: 0.95rem;
 	color: var(--text-light);
+	white-space: nowrap;
 	transition: color var(--transition-fast);
 }
 
@@ -116,6 +133,33 @@
 .primary-nav__list .current-menu-item > a,
 .primary-nav__list .current-menu-parent > a {
 	color: var(--gold);
+}
+
+/* Underline wipe on the top-level nav links only (not dropdown items,
+   which already get a background highlight instead — see .sub-menu a
+   below). Pseudo-element is ::before, not ::after, since ::after is
+   already taken by the dropdown caret on parent items just below. */
+.primary-nav__list > li > a {
+	position: relative;
+}
+
+.primary-nav__list > li > a::before {
+	content: '';
+	position: absolute;
+	left: 0;
+	right: 0;
+	bottom: -2px;
+	height: 1.5px;
+	background: var(--gold);
+	transform: scaleX(0);
+	transform-origin: left;
+	transition: transform 0.35s cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+.primary-nav__list > li > a:hover::before,
+.primary-nav__list > li.current-menu-item > a::before,
+.primary-nav__list > li.current-menu-parent > a::before {
+	transform: scaleX(1);
 }
 
 /* Dropdown caret on parent items (WP adds .menu-item-has-children automatically) */
@@ -137,8 +181,71 @@
 	display: none;
 }
 
-.primary-nav__cta {
+/* Header hotline pill — icon badge + "24/7 Hotline" label/number, in
+   the same header-right slot the old "Get Started" CTA button used to
+   occupy. Number comes from the same Customizer > Contact Info phone
+   field used everywhere else (royal_limo_phone), so it's dynamic. */
+.primary-nav__hotline {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.6rem;
 	flex: 0 0 auto;
+	padding: 0.4rem 1.1rem 0.4rem 0.4rem;
+	border: 1.5px solid var(--gold);
+	border-radius: var(--radius-pill);
+	transition: background var(--transition-fast), border-color var(--transition-fast);
+}
+
+.primary-nav__hotline:hover {
+	background: rgba(201, 162, 75, 0.12);
+}
+
+.primary-nav__hotline-icon {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 34px;
+	height: 34px;
+	border-radius: 50%;
+	background: var(--gold);
+	color: var(--bg-black);
+	flex: 0 0 auto;
+}
+
+.primary-nav__hotline-text {
+	display: flex;
+	flex-direction: column;
+	line-height: 1.2;
+}
+
+.primary-nav__hotline-label {
+	font-size: 0.65rem;
+	text-transform: uppercase;
+	letter-spacing: 0.06em;
+	color: var(--gold);
+	font-weight: 600;
+}
+
+.primary-nav__hotline-number {
+	font-size: 0.9rem;
+	font-weight: 700;
+	color: var(--text-light);
+	white-space: nowrap;
+}
+
+@media (max-width: 1024px) {
+	/* Not enough combined room for the logo, full nav list, and the full
+	   label+number pill below this width — collapse the hotline to just
+	   its icon badge (a tap-to-call button) so the logo and nav links
+	   keep their natural size instead of visually colliding. */
+	.primary-nav__hotline {
+		padding: 0;
+		border: none;
+	}
+
+	.primary-nav__hotline-text {
+		display: none;
+	}
 }
 
 /* ---- Submenus (dropdowns) ---- */
@@ -752,7 +859,6 @@ a.rl-card:hover {
 	margin-bottom: var(--space-lg);
 }
 
-.rl-filter-tabs__btn,
 .rl-filter-tabs__link {
 	padding: 0.55rem 1.15rem;
 	border: 1px solid var(--glass-border);
@@ -765,13 +871,11 @@ a.rl-card:hover {
 	transition: background var(--transition-fast), color var(--transition-fast), border-color var(--transition-fast);
 }
 
-.rl-filter-tabs__btn:hover,
 .rl-filter-tabs__link:hover {
 	color: var(--text-light);
 	border-color: var(--gold);
 }
 
-.rl-filter-tabs__btn.is-active,
 .rl-filter-tabs__link.is-active {
 	background: linear-gradient(135deg, var(--gold-soft), var(--gold));
 	border-color: transparent;
@@ -822,24 +926,49 @@ a.rl-card:hover {
 	flex: 1;
 }
 
-.rl-fleet-card__top {
-	display: flex;
-	align-items: baseline;
-	justify-content: space-between;
-	gap: var(--space-sm);
-}
-
-.rl-fleet-card__top .rl-card__title {
+.rl-fleet-card__title {
 	margin-bottom: 0;
-	font-size: 1.1rem;
+	font-size: 1.15rem;
 }
 
-.rl-fleet-card__price {
-	flex: 0 0 auto;
+/* Full Day / Half Day side by side, same rate-table treatment as the
+   single vehicle page's sidebar (see .rl-fleet-price in the fleet
+   detail page section below) so pricing reads consistently sitewide. */
+.rl-fleet-card__rates {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	border: 1px solid var(--glass-border);
+	border-radius: var(--radius-sm);
+	overflow: hidden;
+}
+
+.rl-fleet-card__rate {
+	display: flex;
+	flex-direction: column;
+	gap: 0.15rem;
+	padding: 0.6rem 0.75rem;
+}
+
+.rl-fleet-card__rate--full {
+	background: rgba(201, 162, 75, 0.08);
+	border-right: 1px solid var(--glass-border);
+}
+
+.rl-fleet-card__rate--full:last-child {
+	border-right: none;
+}
+
+.rl-fleet-card__rate-label {
+	font-size: 0.66rem;
+	text-transform: uppercase;
+	letter-spacing: 0.05em;
+	color: var(--text-muted);
+}
+
+.rl-fleet-card__rate-amount {
+	font-size: 0.98rem;
+	font-weight: 700;
 	color: var(--gold);
-	font-weight: 600;
-	font-size: 0.85rem;
-	white-space: nowrap;
 }
 
 .rl-fleet-card__specs {
@@ -1809,6 +1938,23 @@ body.rl-modal-open {
 	text-align: center;
 }
 
+/* Real photo, once one's set in Customizer > About Section — same
+   footprint/rounded corners as the placeholder .rl-about-card above so
+   the grid layout doesn't shift depending on which one renders. */
+.rl-about-media {
+	min-height: 320px;
+	border-radius: var(--radius-lg);
+	overflow: hidden;
+}
+
+.rl-about-media img {
+	display: block;
+	width: 100%;
+	height: 100%;
+	min-height: 320px;
+	object-fit: cover;
+}
+
 .rl-about-card__glow {
 	position: absolute;
 	inset: 0;
@@ -2231,6 +2377,16 @@ a.rl-reviews-badge:hover .rl-reviews-badge__count {
 	font-size: 0.9rem;
 }
 
+/* Both .rl-service-process and .rl-service-additional are plain
+   .rl-section elements (padding-block: var(--space-2xl) each) — when
+   a service has both, that's the bottom padding of one plus the top
+   padding of the next stacking into a huge empty gap between "How It
+   Works" and the rich-text content below it. Drop the second section's
+   top padding only when it directly follows the first. */
+.rl-service-process + .rl-service-additional {
+	padding-top: 0;
+}
+
 @media (max-width: 900px) {
 	.rl-service-detail__layout {
 		grid-template-columns: 1fr;
@@ -2260,24 +2416,48 @@ a.rl-reviews-badge:hover .rl-reviews-badge__count {
    structural classes built for single-service.php as-is — same two-
    column layout, same sidebar card treatment, same FAQ accordion. */
 
+/* Full Day / Half Day shown side by side as a small rate table rather
+   than a single big amount — both prices matter equally here. */
 .rl-fleet-price {
-	display: flex;
-	align-items: baseline;
-	gap: 0.4rem;
+	display: grid;
+	grid-template-columns: 1fr 1fr;
 	margin-bottom: var(--space-md);
+	border: 1px solid var(--glass-border);
+	border-radius: var(--radius-md);
+	overflow: hidden;
+}
+
+.rl-fleet-price__col {
+	display: flex;
+	flex-direction: column;
+	gap: 0.25rem;
+	padding: 0.75rem 0.6rem;
+	min-width: 0;
+}
+
+.rl-fleet-price__col--full {
+	background: rgba(201, 162, 75, 0.08);
+	border-right: 1px solid var(--glass-border);
+}
+
+.rl-fleet-price__col--full:last-child {
+	border-right: none;
+}
+
+.rl-fleet-price__label {
+	font-size: 0.7rem;
+	text-transform: uppercase;
+	letter-spacing: 0.06em;
+	color: var(--text-muted);
 }
 
 .rl-fleet-price__amount {
 	font-family: var(--font-heading);
-	font-size: 2rem;
+	font-size: 1.15rem;
 	font-weight: 700;
 	color: var(--gold);
-	line-height: 1;
-}
-
-.rl-fleet-price__unit {
-	color: var(--text-muted);
-	font-size: 0.85rem;
+	line-height: 1.2;
+	white-space: nowrap;
 }
 
 .rl-fleet-specs-list {
@@ -2733,6 +2913,108 @@ a.rl-reviews-badge:hover .rl-reviews-badge__count {
 	font-weight: 600;
 }
 
+/* ---- Infinite scroll loader (Fleet / Services / Blog archives) ---- */
+.rl-infinite-loader {
+	display: flex;
+	justify-content: center;
+	padding: var(--space-lg) 0;
+	opacity: 0;
+	transition: opacity var(--transition-fast);
+}
+
+.rl-infinite-loader.is-loading {
+	opacity: 1;
+}
+
+/* ---- Floating WhatsApp button (sitewide, footer.php) ----
+   Number is separate from the main Phone Number field — see
+   royal_limo_whatsapp_url() in functions.php. Only rendered at all
+   when a number is set (Customizer > Contact Info), same graceful-
+   omission pattern as everything else optional in this theme. */
+.rl-whatsapp-float {
+	position: fixed;
+	right: var(--space-md);
+	bottom: var(--space-md);
+	z-index: 999;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 58px;
+	height: 58px;
+	border-radius: 50%;
+	background: #25d366;
+	color: #fff;
+	box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
+	transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.rl-whatsapp-float:hover {
+	transform: translateY(-3px) scale(1.05);
+	box-shadow: 0 10px 26px rgba(0, 0, 0, 0.45);
+	color: #fff;
+}
+
+.rl-whatsapp-float::before {
+	content: '';
+	position: absolute;
+	inset: -6px;
+	border-radius: 50%;
+	background: rgba(37, 211, 102, 0.45);
+	animation: rl-whatsapp-pulse 2.2s ease-out infinite;
+	z-index: -1;
+}
+
+@keyframes rl-whatsapp-pulse {
+	0% {
+		transform: scale(0.85);
+		opacity: 0.6;
+	}
+	70% {
+		transform: scale(1.35);
+		opacity: 0;
+	}
+	100% {
+		transform: scale(1.35);
+		opacity: 0;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.rl-whatsapp-float::before {
+		animation: none;
+	}
+}
+
+@media (max-width: 640px) {
+	.rl-whatsapp-float {
+		width: 52px;
+		height: 52px;
+		right: var(--space-sm);
+		bottom: var(--space-sm);
+	}
+}
+
+.rl-infinite-loader__spinner {
+	width: 28px;
+	height: 28px;
+	border: 3px solid var(--glass-border);
+	border-top-color: var(--gold);
+	border-radius: 50%;
+	animation: rl-infinite-spin 0.8s linear infinite;
+}
+
+@keyframes rl-infinite-spin {
+	to {
+		transform: rotate(360deg);
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.rl-infinite-loader__spinner {
+		animation: none;
+	}
+}
+
 /* ==========================================================================
    Responsive breakpoints
    ========================================================================== */
@@ -2805,7 +3087,7 @@ a.rl-reviews-badge:hover .rl-reviews-badge__count {
 		border-top: 1px solid var(--glass-border);
 	}
 
-	.primary-nav__cta {
+	.primary-nav__hotline {
 		align-self: flex-start;
 	}
 

@@ -59,7 +59,16 @@
 			type: 'number',
 			value: meta[ key ] === undefined || meta[ key ] === null ? '' : meta[ key ],
 			onChange: function ( value ) {
-				setMetaField( key, value === '' ? '' : Number( value ) );
+				// These meta fields are registered with REST type
+				// 'number'/'integer' (see inc/custom-post-types.php) —
+				// sending '' (e.g. while the field is briefly empty
+				// mid-edit) fails that schema validation and the whole
+				// save is rejected ("Updating failed" in the editor).
+				// 0 satisfies the schema and every template already
+				// treats a falsy value the same as "not set" (hides the
+				// price/spec row), so it's a safe stand-in for "empty".
+				var parsed = Number( value );
+				setMetaField( key, value === '' || isNaN( parsed ) ? 0 : parsed );
 			},
 		} );
 	}
@@ -75,8 +84,8 @@
 			numberField( __( 'Seating Capacity (seats)', 'royal-limo' ), '_fleet_seating_capacity', meta, setMetaField ),
 			numberField( __( 'Luggage Capacity (bags)', 'royal-limo' ), '_fleet_luggage_capacity', meta, setMetaField ),
 			numberField( __( 'Max Passengers (Pax)', 'royal-limo' ), '_fleet_pax', meta, setMetaField ),
-			numberField( __( 'Full Day Price ($)', 'royal-limo' ), '_fleet_price_full_day', meta, setMetaField ),
-			numberField( __( 'Half Day Price ($)', 'royal-limo' ), '_fleet_price_half_day', meta, setMetaField ),
+			numberField( __( 'Full Day Price (AED)', 'royal-limo' ), '_fleet_price_full_day', meta, setMetaField ),
+			numberField( __( 'Half Day Price (AED)', 'royal-limo' ), '_fleet_price_half_day', meta, setMetaField ),
 			el( TextControl, {
 				key: '_fleet_specs',
 				label: __( 'Specs line (e.g. "Leather interior · Bar · WiFi")', 'royal-limo' ),
@@ -184,40 +193,45 @@
 	}
 
 	/**
-	 * Banner image picker — separate from the featured image (used
-	 * elsewhere for the in-content photo), so the page-header banner
-	 * and the content photo can be two different pictures instead of
-	 * the same one repeating down the page.
+	 * Generic image picker — used for banner images, in-content photos,
+	 * anywhere a single-image meta field is needed. Generalized from
+	 * what used to be a Service-page-only "Banner Image" field (now
+	 * takes metaKey/label/help so it works for any of them, including
+	 * the several About page image fields below).
 	 */
-	function BannerImageField( meta, setMetaField ) {
+	function ImageField( meta, setMetaField, metaKey, label, helpText ) {
 		var MediaUpload = getMediaUpload();
-		var imageUrl = meta._service_banner_image || '';
+		var imageUrl = meta[ metaKey ] || '';
 
 		if ( ! MediaUpload ) {
 			return el( 'p', { className: 'components-base-control__help', style: { color: '#cc1818' } },
-				__( 'Banner Image picker unavailable — your browser may have an outdated copy of the editor scripts. Try a hard refresh (Ctrl+Shift+R / Cmd+Shift+R).', 'royal-limo' )
+				__( 'Image picker unavailable — your browser may have an outdated copy of the editor scripts. Try a hard refresh (Ctrl+Shift+R / Cmd+Shift+R).', 'royal-limo' )
 			);
 		}
 
 		return el( 'div', { className: 'royal-limo-field', style: { marginBottom: '24px' } },
-			el( 'p', { className: 'components-base-control__label' }, __( 'Banner Image', 'royal-limo' ) ),
-			el( 'p', { className: 'components-base-control__help', style: { marginTop: 0 } }, __( 'Shown in the page-header banner at the top. Falls back to the featured image if left empty.', 'royal-limo' ) ),
+			el( 'p', { className: 'components-base-control__label' }, label ),
+			helpText ? el( 'p', { className: 'components-base-control__help', style: { marginTop: 0 } }, helpText ) : null,
 			imageUrl ? el( 'img', { src: imageUrl, style: { maxWidth: '100%', display: 'block', marginBottom: '8px', borderRadius: '4px' } } ) : null,
 			el( MediaUpload, {
 				onSelect: function ( media ) {
-					setMetaField( '_service_banner_image', media.url );
+					setMetaField( metaKey, media.url );
 				},
 				allowedTypes: [ 'image' ],
 				render: function ( obj ) {
 					return el( Fragment, {},
 						el( Button, { variant: 'secondary', onClick: obj.open }, imageUrl ? __( 'Change Image', 'royal-limo' ) : __( 'Select Image', 'royal-limo' ) ),
 						imageUrl ? el( Button, { variant: 'link', isDestructive: true, style: { marginLeft: '8px' }, onClick: function () {
-							setMetaField( '_service_banner_image', '' );
+							setMetaField( metaKey, '' );
 						} }, __( 'Remove', 'royal-limo' ) ) : null
 					);
 				},
 			} )
 		);
+	}
+
+	function sectionLabel( text ) {
+		return el( 'p', { style: { fontWeight: 600, marginBottom: '4px' } }, text );
 	}
 
 	/**
@@ -331,7 +345,7 @@
 		return el(
 			PluginDocumentSettingPanel,
 			{ name: 'royal-limo-service-details', title: __( 'Service Detail Page', 'royal-limo' ), icon: 'star-filled' },
-			BannerImageField( meta, setMetaField ),
+			ImageField( meta, setMetaField, '_service_banner_image', __( 'Banner Image', 'royal-limo' ), __( 'Shown in the page-header banner at the top. Falls back to the featured image if left empty.', 'royal-limo' ) ),
 			el( 'hr' ),
 			el( 'p', { className: 'components-base-control__help' }, __( '"Why Choose This Service?" checklist — leave any blank to skip. Section heading defaults to "Why Choose [Service Name]?" if left blank.', 'royal-limo' ) ),
 			textField( __( 'Section Heading (optional)', 'royal-limo' ), '_service_benefits_heading', meta, setMetaField ),
@@ -383,10 +397,112 @@
 		);
 	}
 
+	/**
+	 * The entire About page (page-about.php) — banner, About Us, Our
+	 * Approach, Why Choose Us, Key Persons, What We Do — edited from one
+	 * panel on the page itself instead of scattered across Customizer
+	 * sections. Only rendered for pages actually using that template
+	 * (see the postType + template check in RoyalLimoPanels below), so
+	 * every other page's editor stays uncluttered.
+	 */
+	function AboutPageDetailsPanel() {
+		var metaState = useMeta();
+		var meta = metaState[0];
+		var setMetaField = metaState[1];
+
+		return el(
+			PluginDocumentSettingPanel,
+			{ name: 'royal-limo-about-page-details', title: __( 'About Page Content', 'royal-limo' ), icon: 'admin-page' },
+
+			sectionLabel( __( 'Banner', 'royal-limo' ) ),
+			ImageField( meta, setMetaField, '_about_banner_image', __( 'Banner Image', 'royal-limo' ), __( 'Shown behind the page title at the top. Leave blank for a plain dark background. (Title comes from the page title above, not a separate field.)', 'royal-limo' ) ),
+
+			el( 'hr' ),
+			sectionLabel( __( 'About Us', 'royal-limo' ) ),
+			textField( __( 'Eyebrow', 'royal-limo' ), '_about_eyebrow', meta, setMetaField ),
+			textField( __( 'Heading', 'royal-limo' ), '_about_heading', meta, setMetaField ),
+			textareaField( __( 'Description', 'royal-limo' ), '_about_description', meta, setMetaField, 6 ),
+			ImageField( meta, setMetaField, '_about_image', __( 'Image', 'royal-limo' ), __( 'Shown beside the description. Leave blank to show a placeholder brand card instead.', 'royal-limo' ) ),
+			textField( __( 'Trust Bar Heading', 'royal-limo' ), '_about_bar_heading', meta, setMetaField ),
+			textField( __( 'Trust Bar Tagline', 'royal-limo' ), '_about_bar_text', meta, setMetaField ),
+			textField( __( 'Google Rating (e.g. "4.9")', 'royal-limo' ), '_about_reviews_rating', meta, setMetaField ),
+			textField( __( 'Review Count (e.g. "500+")', 'royal-limo' ), '_about_reviews_count', meta, setMetaField ),
+			textField( __( 'Google Business Profile URL', 'royal-limo' ), '_about_reviews_url', meta, setMetaField, 'url' ),
+
+			el( 'hr' ),
+			sectionLabel( __( 'Our Approach', 'royal-limo' ) ),
+			textField( __( 'Eyebrow', 'royal-limo' ), '_approach_eyebrow', meta, setMetaField ),
+			textField( __( 'Heading', 'royal-limo' ), '_approach_heading', meta, setMetaField ),
+			ImageField( meta, setMetaField, '_approach_image', __( 'Image', 'royal-limo' ), __( 'Leave blank to use a stylised placeholder background instead.', 'royal-limo' ) ),
+			textField( __( 'Mission — Heading', 'royal-limo' ), '_approach_mission_heading', meta, setMetaField ),
+			textField( __( 'Mission — Point 1', 'royal-limo' ), '_approach_mission_point1', meta, setMetaField ),
+			textField( __( 'Mission — Point 2', 'royal-limo' ), '_approach_mission_point2', meta, setMetaField ),
+			textField( __( 'Vision — Heading', 'royal-limo' ), '_approach_vision_heading', meta, setMetaField ),
+			textField( __( 'Vision — Point 1', 'royal-limo' ), '_approach_vision_point1', meta, setMetaField ),
+			textField( __( 'Vision — Point 2', 'royal-limo' ), '_approach_vision_point2', meta, setMetaField ),
+
+			el( 'hr' ),
+			sectionLabel( __( 'Why Choose Us', 'royal-limo' ) ),
+			textField( __( 'Eyebrow', 'royal-limo' ), '_why_us_eyebrow', meta, setMetaField ),
+			textField( __( 'Heading', 'royal-limo' ), '_why_us_heading', meta, setMetaField ),
+			textareaField( __( 'Description', 'royal-limo' ), '_why_us_description', meta, setMetaField, 3 ),
+			textField( __( 'Reason 1 — Heading', 'royal-limo' ), '_why_us_1_heading', meta, setMetaField ),
+			textField( __( 'Reason 1 — Description', 'royal-limo' ), '_why_us_1_description', meta, setMetaField ),
+			textField( __( 'Reason 2 — Heading', 'royal-limo' ), '_why_us_2_heading', meta, setMetaField ),
+			textField( __( 'Reason 2 — Description', 'royal-limo' ), '_why_us_2_description', meta, setMetaField ),
+			textField( __( 'Reason 3 — Heading', 'royal-limo' ), '_why_us_3_heading', meta, setMetaField ),
+			textField( __( 'Reason 3 — Description', 'royal-limo' ), '_why_us_3_description', meta, setMetaField ),
+			textField( __( 'Reason 4 — Heading', 'royal-limo' ), '_why_us_4_heading', meta, setMetaField ),
+			textField( __( 'Reason 4 — Description', 'royal-limo' ), '_why_us_4_description', meta, setMetaField ),
+
+			el( 'hr' ),
+			sectionLabel( __( 'Key Persons', 'royal-limo' ) ),
+			el( 'p', { className: 'components-base-control__help' }, __( 'The people themselves (photo/name/role/social links) are managed under Team Members in the left-hand admin menu — these three fields are just this section\'s heading text.', 'royal-limo' ) ),
+			textField( __( 'Eyebrow', 'royal-limo' ), '_team_eyebrow', meta, setMetaField ),
+			textField( __( 'Heading', 'royal-limo' ), '_team_heading', meta, setMetaField ),
+			textareaField( __( 'Description', 'royal-limo' ), '_team_description', meta, setMetaField, 3 ),
+
+			el( 'hr' ),
+			sectionLabel( __( 'What We Do', 'royal-limo' ) ),
+			textField( __( 'Eyebrow', 'royal-limo' ), '_wwd_eyebrow', meta, setMetaField ),
+			textField( __( 'Heading', 'royal-limo' ), '_wwd_heading', meta, setMetaField ),
+			textareaField( __( 'Description', 'royal-limo' ), '_wwd_description', meta, setMetaField, 3 ),
+			ImageField( meta, setMetaField, '_wwd_image', __( 'Image', 'royal-limo' ), __( 'Leave blank to use a stylised placeholder background instead.', 'royal-limo' ) ),
+			textField( __( 'Feature 1 — Heading', 'royal-limo' ), '_wwd_1_heading', meta, setMetaField ),
+			textField( __( 'Feature 1 — Description', 'royal-limo' ), '_wwd_1_description', meta, setMetaField ),
+			textField( __( 'Feature 2 — Heading', 'royal-limo' ), '_wwd_2_heading', meta, setMetaField ),
+			textField( __( 'Feature 2 — Description', 'royal-limo' ), '_wwd_2_description', meta, setMetaField ),
+			textField( __( 'Feature 3 — Heading', 'royal-limo' ), '_wwd_3_heading', meta, setMetaField ),
+			textField( __( 'Feature 3 — Description', 'royal-limo' ), '_wwd_3_description', meta, setMetaField ),
+			textField( __( 'Feature 4 — Heading', 'royal-limo' ), '_wwd_4_heading', meta, setMetaField ),
+			textField( __( 'Feature 4 — Description', 'royal-limo' ), '_wwd_4_description', meta, setMetaField )
+		);
+	}
+
+	/**
+	 * Contact page — just the banner image (everything else on that
+	 * page already comes from Customizer > Contact Info, unchanged).
+	 */
+	function ContactPageDetailsPanel() {
+		var metaState = useMeta();
+		var meta = metaState[0];
+		var setMetaField = metaState[1];
+
+		return el(
+			PluginDocumentSettingPanel,
+			{ name: 'royal-limo-contact-page-details', title: __( 'Contact Page Banner', 'royal-limo' ), icon: 'admin-page' },
+			ImageField( meta, setMetaField, '_contact_banner_image', __( 'Banner Image', 'royal-limo' ), __( 'Shown behind the page title at the top. Leave blank for a plain dark background.', 'royal-limo' ) )
+		);
+	}
+
 	function RoyalLimoPanels() {
 		var postType = useSelect( function ( select ) {
 			var editor = select( 'core/editor' );
 			return editor ? editor.getCurrentPostType() : null;
+		}, [] );
+		var template = useSelect( function ( select ) {
+			var editor = select( 'core/editor' );
+			return editor ? editor.getEditedPostAttribute( 'template' ) : '';
 		}, [] );
 
 		if ( 'fleet' === postType ) {
@@ -403,6 +519,12 @@
 		}
 		if ( 'team_member' === postType ) {
 			return el( TeamMemberDetailsPanel );
+		}
+		if ( 'page' === postType && 'page-about.php' === template ) {
+			return el( AboutPageDetailsPanel );
+		}
+		if ( 'page' === postType && 'page-contact.php' === template ) {
+			return el( ContactPageDetailsPanel );
 		}
 		return null;
 	}

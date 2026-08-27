@@ -17,7 +17,6 @@ while ( have_posts() ) :
 
 	$current_id = get_the_ID();
 
-	$seating  = get_post_meta( $current_id, '_fleet_seating_capacity', true );
 	$luggage  = get_post_meta( $current_id, '_fleet_luggage_capacity', true );
 	$pax      = get_post_meta( $current_id, '_fleet_pax', true );
 	$full_day = get_post_meta( $current_id, '_fleet_price_full_day', true );
@@ -64,20 +63,24 @@ while ( have_posts() ) :
 			<div class="rl-service-detail__layout">
 				<aside class="rl-service-sidebar rl-reveal">
 					<div class="rl-service-sidebar__card">
-						<?php if ( $full_day ) : ?>
+						<?php if ( $full_day || $half_day ) : ?>
 							<div class="rl-fleet-price">
-								<span class="rl-fleet-price__amount">$<?php echo esc_html( number_format_i18n( $full_day, 0 ) ); ?></span>
-								<span class="rl-fleet-price__unit"><?php esc_html_e( '/ Per Day', 'royal-limo' ); ?></span>
+							<?php if ( $full_day ) : ?>
+								<div class="rl-fleet-price__col rl-fleet-price__col--full">
+									<span class="rl-fleet-price__label"><?php esc_html_e( 'Full Day', 'royal-limo' ); ?></span>
+								<span class="rl-fleet-price__amount">AED <?php echo esc_html( number_format_i18n( $full_day, 0 ) ); ?></span>
+								</div>
+							<?php endif; ?>
+							<?php if ( $half_day ) : ?>
+								<div class="rl-fleet-price__col rl-fleet-price__col--half">
+									<span class="rl-fleet-price__label"><?php esc_html_e( 'Half Day', 'royal-limo' ); ?></span>
+									<span class="rl-fleet-price__amount">AED <?php echo esc_html( number_format_i18n( $half_day, 0 ) ); ?></span>
+								</div>
+							<?php endif; ?>
 							</div>
 						<?php endif; ?>
 
 						<ul class="rl-fleet-specs-list">
-							<?php if ( $seating ) : ?>
-								<li>
-									<span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 17v3M20 17v3M5 17h14l-1.5-7.5A2 2 0 0015.55 8h-7.1a2 2 0 00-1.95 1.5L5 17zM7 12h10"/></svg><?php esc_html_e( 'Seats', 'royal-limo' ); ?></span>
-									<strong><?php echo esc_html( $seating ); ?></strong>
-								</li>
-							<?php endif; ?>
 							<?php if ( $luggage ) : ?>
 								<li>
 									<span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="8" width="16" height="12" rx="2"/><path d="M9 8V6a3 3 0 016 0v2"/></svg><?php esc_html_e( 'Luggage', 'royal-limo' ); ?></span>
@@ -88,12 +91,6 @@ while ( have_posts() ) :
 								<li>
 									<span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="3"/><path d="M5 21v-2a7 7 0 0114 0v2"/></svg><?php esc_html_e( 'Max Pax', 'royal-limo' ); ?></span>
 									<strong><?php echo esc_html( $pax ); ?></strong>
-								</li>
-							<?php endif; ?>
-							<?php if ( $half_day ) : ?>
-								<li>
-									<span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg><?php esc_html_e( 'Half Day', 'royal-limo' ); ?></span>
-									<strong>$<?php echo esc_html( number_format_i18n( $half_day, 0 ) ); ?></strong>
 								</li>
 							<?php endif; ?>
 						</ul>

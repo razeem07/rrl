@@ -6,7 +6,7 @@
  */
 $services_query = new WP_Query( array(
 	'post_type'      => 'service',
-	'posts_per_page' => 8,
+	'posts_per_page' => 6,
 	'orderby'        => 'menu_order',
 	'order'          => 'ASC',
 	'no_found_rows'  => true,

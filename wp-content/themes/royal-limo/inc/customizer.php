@@ -24,6 +24,28 @@ function royal_limo_customize_register( $wp_customize ) {
 		'type'    => 'text',
 	) );
 
+	$wp_customize->add_setting( 'royal_limo_whatsapp_number', array(
+		'default'           => '',
+		'sanitize_callback' => 'sanitize_text_field',
+	) );
+	$wp_customize->add_control( 'royal_limo_whatsapp_number', array(
+		'label'       => __( 'WhatsApp Number', 'royal-limo' ),
+		'description' => __( 'Include the country code (e.g. +1 555 010 2026). Separate from the Phone Number above — powers the floating WhatsApp button shown sitewide. Leave blank to hide that button.', 'royal-limo' ),
+		'section'     => 'royal_limo_contact',
+		'type'        => 'text',
+	) );
+
+	$wp_customize->add_setting( 'royal_limo_whatsapp_message', array(
+		'default'           => "Hi! I'd like to book a ride.",
+		'sanitize_callback' => 'sanitize_text_field',
+	) );
+	$wp_customize->add_control( 'royal_limo_whatsapp_message', array(
+		'label'       => __( 'WhatsApp Pre-filled Message', 'royal-limo' ),
+		'description' => __( 'Appears already typed in the chat when a visitor taps the WhatsApp button.', 'royal-limo' ),
+		'section'     => 'royal_limo_contact',
+		'type'        => 'text',
+	) );
+
 	$wp_customize->add_setting( 'royal_limo_email', array(
 		'default'           => 'reservations@example.com',
 		'sanitize_callback' => 'sanitize_email',
@@ -78,43 +100,16 @@ function royal_limo_customize_register( $wp_customize ) {
 		) );
 	}
 
-	// Hero section.
+	// Hero section — heading/subheading/background image used to live
+	// here as Customizer fields, but the hero carousel is now driven
+	// entirely by the "banner" CPT (see template-parts/hero.php); those
+	// fields were removed since they no longer did anything once real
+	// banners existed. Only the trust-stats row (shared across every
+	// slide) remains a Customizer-managed value.
 	$wp_customize->add_section( 'royal_limo_hero', array(
 		'title'    => __( 'Hero Section', 'royal-limo' ),
 		'priority' => 25,
 	) );
-
-	$wp_customize->add_setting( 'royal_limo_hero_heading', array(
-		'default'           => 'Arrive in Absolute Style',
-		'sanitize_callback' => 'sanitize_text_field',
-	) );
-	$wp_customize->add_control( 'royal_limo_hero_heading', array(
-		'label'   => __( 'Hero Heading', 'royal-limo' ),
-		'section' => 'royal_limo_hero',
-		'type'    => 'text',
-	) );
-
-	$wp_customize->add_setting( 'royal_limo_hero_subheading', array(
-		'default'           => ROYAL_LIMO_DEFAULT_HERO_SUBHEADING,
-		'sanitize_callback' => 'sanitize_textarea_field',
-	) );
-	$wp_customize->add_control( 'royal_limo_hero_subheading', array(
-		'label'   => __( 'Hero Subheading', 'royal-limo' ),
-		'section' => 'royal_limo_hero',
-		'type'    => 'textarea',
-	) );
-
-	$wp_customize->add_setting( 'royal_limo_hero_image', array(
-		'default'           => '',
-		// WP_Customize_Image_Control writes the attachment URL (not its
-		// ID) to the setting — sanitize as a URL, not absint(), or every
-		// real selection gets silently mangled to 0.
-		'sanitize_callback' => 'esc_url_raw',
-	) );
-	$wp_customize->add_control( new WP_Customize_Image_Control( $wp_customize, 'royal_limo_hero_image', array(
-		'label'   => __( 'Hero Background Image', 'royal-limo' ),
-		'section' => 'royal_limo_hero',
-	) ) );
 
 	// Hero trust stats — the small "50+ Premium Brands" style row shown
 	// under the CTAs. Same 3 values appear on every carousel slide (it's
@@ -178,7 +173,7 @@ function royal_limo_customize_register( $wp_customize ) {
 	) );
 
 	$wp_customize->add_setting( 'royal_limo_service_areas_heading', array(
-		'default'           => 'Serving You Across Los Angeles',
+		'default'           => 'Serving You Across the UAE',
 		'sanitize_callback' => 'sanitize_text_field',
 	) );
 	$wp_customize->add_control( 'royal_limo_service_areas_heading', array(
@@ -188,7 +183,7 @@ function royal_limo_customize_register( $wp_customize ) {
 	) );
 
 	$wp_customize->add_setting( 'royal_limo_service_areas_description', array(
-		'default'           => 'Enjoy complimentary pickup and drop-off across Los Angeles and the Westside — including LAX, Downtown, Beverly Hills, Santa Monica, and Hollywood. Additional areas available by request.',
+		'default'           => 'Enjoy complimentary pickup and drop-off across Dubai and the wider UAE — including Dubai International Airport, Downtown Dubai, Dubai Marina, Palm Jumeirah, and Abu Dhabi. Additional areas available by request.',
 		'sanitize_callback' => 'sanitize_textarea_field',
 	) );
 	$wp_customize->add_control( 'royal_limo_service_areas_description', array(
@@ -198,11 +193,11 @@ function royal_limo_customize_register( $wp_customize ) {
 	) );
 
 	$service_area_defaults = array(
-		1 => 'LAX Airport',
-		2 => 'Downtown LA',
-		3 => 'Beverly Hills',
-		4 => 'Santa Monica',
-		5 => 'Hollywood',
+		1 => 'Dubai Airport',
+		2 => 'Downtown Dubai',
+		3 => 'Dubai Marina',
+		4 => 'Palm Jumeirah',
+		5 => 'Abu Dhabi',
 	);
 	foreach ( $service_area_defaults as $i => $default_label ) {
 		$wp_customize->add_setting( "royal_limo_service_area_{$i}", array(
@@ -253,6 +248,18 @@ function royal_limo_customize_register( $wp_customize ) {
 		'section'     => 'royal_limo_about',
 		'type'        => 'textarea',
 	) );
+
+	$wp_customize->add_setting( 'royal_limo_about_image', array(
+		'default'           => '',
+		// See the note on royal_limo_video_image above — this control
+		// stores a URL, not an attachment ID.
+		'sanitize_callback' => 'esc_url_raw',
+	) );
+	$wp_customize->add_control( new WP_Customize_Image_Control( $wp_customize, 'royal_limo_about_image', array(
+		'label'       => __( 'Image', 'royal-limo' ),
+		'description' => __( 'Shown on the right side of the About section. Leave blank to show a placeholder brand card instead. Recommended: a portrait/vertical photo, at least 1200×1500px.', 'royal-limo' ),
+		'section'     => 'royal_limo_about',
+	) ) );
 
 	$wp_customize->add_setting( 'royal_limo_about_bar_heading', array(
 		'default'           => 'Why Book With Us?',
@@ -444,8 +451,10 @@ function royal_limo_customize_register( $wp_customize ) {
 
 	$wp_customize->add_setting( 'royal_limo_video_image', array(
 		'default'           => '',
-		// See the note on royal_limo_hero_image above — this control
-		// stores a URL, not an attachment ID.
+		// WP_Customize_Image_Control writes the attachment URL (not its
+		// ID) to the setting — sanitize as a URL, not absint(), or every
+		// real selection gets silently mangled to 0. Same note applies
+		// to every other image control below.
 		'sanitize_callback' => 'esc_url_raw',
 	) );
 	$wp_customize->add_control( new WP_Customize_Image_Control( $wp_customize, 'royal_limo_video_image', array(
@@ -502,6 +511,18 @@ function royal_limo_customize_register( $wp_customize ) {
 		'type'    => 'textarea',
 	) );
 
+	$wp_customize->add_setting( 'royal_limo_fleet_banner_image', array(
+		'default'           => '',
+		// See the note on royal_limo_video_image above — this control
+		// stores a URL, not an attachment ID.
+		'sanitize_callback' => 'esc_url_raw',
+	) );
+	$wp_customize->add_control( new WP_Customize_Image_Control( $wp_customize, 'royal_limo_fleet_banner_image', array(
+		'label'       => __( 'Banner Image', 'royal-limo' ),
+		'description' => __( 'Background photo for the full-width banner at the top of the /fleet/ listing page and its category pages. Leave blank for a plain dark background.', 'royal-limo' ),
+		'section'     => 'royal_limo_fleet',
+	) ) );
+
 	// Services — header text only; cards come from the "service" CPT.
 	$wp_customize->add_section( 'royal_limo_services', array(
 		'title'    => __( 'Services Section', 'royal-limo' ),
@@ -537,6 +558,18 @@ function royal_limo_customize_register( $wp_customize ) {
 		'section' => 'royal_limo_services',
 		'type'    => 'textarea',
 	) );
+
+	$wp_customize->add_setting( 'royal_limo_services_banner_image', array(
+		'default'           => '',
+		// See the note on royal_limo_video_image above — this control
+		// stores a URL, not an attachment ID.
+		'sanitize_callback' => 'esc_url_raw',
+	) );
+	$wp_customize->add_control( new WP_Customize_Image_Control( $wp_customize, 'royal_limo_services_banner_image', array(
+		'label'       => __( 'Banner Image', 'royal-limo' ),
+		'description' => __( 'Background photo for the full-width banner at the top of the /services/ listing page. Leave blank for a plain dark background.', 'royal-limo' ),
+		'section'     => 'royal_limo_services',
+	) ) );
 
 	// Testimonials — header text only; slides come from the
 	// "testimonial" CPT.
@@ -610,6 +643,18 @@ function royal_limo_customize_register( $wp_customize ) {
 		'section' => 'royal_limo_blog',
 		'type'    => 'textarea',
 	) );
+
+	$wp_customize->add_setting( 'royal_limo_blog_banner_image', array(
+		'default'           => '',
+		// See the note on royal_limo_video_image above — this control
+		// stores a URL, not an attachment ID.
+		'sanitize_callback' => 'esc_url_raw',
+	) );
+	$wp_customize->add_control( new WP_Customize_Image_Control( $wp_customize, 'royal_limo_blog_banner_image', array(
+		'label'       => __( 'Banner Image', 'royal-limo' ),
+		'description' => __( 'Background photo for the full-width banner at the top of the /blog/ listing page. Leave blank for a plain dark background.', 'royal-limo' ),
+		'section'     => 'royal_limo_blog',
+	) ) );
 
 	// Note: the single service page's "Our Booking Process" steps and
 	// FAQs are deliberately NOT here — they're per-service content (see
@@ -716,7 +761,7 @@ function royal_limo_customize_register( $wp_customize ) {
 
 	$wp_customize->add_setting( 'royal_limo_booking_cta_image', array(
 		'default'           => '',
-		// See the note on royal_limo_hero_image above — this control
+		// See the note on royal_limo_video_image above — this control
 		// stores a URL, not an attachment ID.
 		'sanitize_callback' => 'esc_url_raw',
 	) );
@@ -726,230 +771,13 @@ function royal_limo_customize_register( $wp_customize ) {
 		'section'     => 'royal_limo_booking_cta',
 	) ) );
 
-	// Our Approach — About page section: Mission/Vision editorial blocks
-	// with an image. Fixed fields, same pattern as Why Choose Us above.
-	$wp_customize->add_section( 'royal_limo_approach', array(
-		'title'    => __( 'Our Approach Section (About Page)', 'royal-limo' ),
-		'priority' => 32,
-	) );
-
-	$wp_customize->add_setting( 'royal_limo_approach_eyebrow', array(
-		'default'           => 'Our Approach',
-		'sanitize_callback' => 'sanitize_text_field',
-	) );
-	$wp_customize->add_control( 'royal_limo_approach_eyebrow', array(
-		'label'   => __( 'Eyebrow Text', 'royal-limo' ),
-		'section' => 'royal_limo_approach',
-		'type'    => 'text',
-	) );
-
-	$wp_customize->add_setting( 'royal_limo_approach_heading', array(
-		'default'           => 'Our Approach to Effortless Chauffeured Travel',
-		'sanitize_callback' => 'sanitize_text_field',
-	) );
-	$wp_customize->add_control( 'royal_limo_approach_heading', array(
-		'label'   => __( 'Heading', 'royal-limo' ),
-		'section' => 'royal_limo_approach',
-		'type'    => 'text',
-	) );
-
-	$wp_customize->add_setting( 'royal_limo_approach_image', array(
-		'default'           => '',
-		// See the note on royal_limo_hero_image above — this control
-		// stores a URL, not an attachment ID.
-		'sanitize_callback' => 'esc_url_raw',
-	) );
-	$wp_customize->add_control( new WP_Customize_Image_Control( $wp_customize, 'royal_limo_approach_image', array(
-		'label'       => __( 'Image', 'royal-limo' ),
-		'description' => __( 'Leave blank to use a stylised placeholder background instead.', 'royal-limo' ),
-		'section'     => 'royal_limo_approach',
-	) ) );
-
-	$wp_customize->add_setting( 'royal_limo_approach_mission_heading', array(
-		'default'           => 'Our Mission',
-		'sanitize_callback' => 'sanitize_text_field',
-	) );
-	$wp_customize->add_control( 'royal_limo_approach_mission_heading', array(
-		'label'   => __( 'Mission — Heading', 'royal-limo' ),
-		'section' => 'royal_limo_approach',
-		'type'    => 'text',
-	) );
-
-	$wp_customize->add_setting( 'royal_limo_approach_mission_point1', array(
-		'default'           => 'Deliver reliable, punctual transportation on every single trip',
-		'sanitize_callback' => 'sanitize_text_field',
-	) );
-	$wp_customize->add_control( 'royal_limo_approach_mission_point1', array(
-		'label'   => __( 'Mission — Point 1', 'royal-limo' ),
-		'section' => 'royal_limo_approach',
-		'type'    => 'text',
-	) );
-
-	$wp_customize->add_setting( 'royal_limo_approach_mission_point2', array(
-		'default'           => 'Treat every rider with the same care and discretion as our first',
-		'sanitize_callback' => 'sanitize_text_field',
-	) );
-	$wp_customize->add_control( 'royal_limo_approach_mission_point2', array(
-		'label'   => __( 'Mission — Point 2', 'royal-limo' ),
-		'section' => 'royal_limo_approach',
-		'type'    => 'text',
-	) );
-
-	$wp_customize->add_setting( 'royal_limo_approach_vision_heading', array(
-		'default'           => 'Our Vision',
-		'sanitize_callback' => 'sanitize_text_field',
-	) );
-	$wp_customize->add_control( 'royal_limo_approach_vision_heading', array(
-		'label'   => __( 'Vision — Heading', 'royal-limo' ),
-		'section' => 'royal_limo_approach',
-		'type'    => 'text',
-	) );
-
-	$wp_customize->add_setting( 'royal_limo_approach_vision_point1', array(
-		'default'           => 'Set the standard for luxury chauffeured travel in Los Angeles',
-		'sanitize_callback' => 'sanitize_text_field',
-	) );
-	$wp_customize->add_control( 'royal_limo_approach_vision_point1', array(
-		'label'   => __( 'Vision — Point 1', 'royal-limo' ),
-		'section' => 'royal_limo_approach',
-		'type'    => 'text',
-	) );
-
-	$wp_customize->add_setting( 'royal_limo_approach_vision_point2', array(
-		'default'           => 'Build lasting trust with every client, one journey at a time',
-		'sanitize_callback' => 'sanitize_text_field',
-	) );
-	$wp_customize->add_control( 'royal_limo_approach_vision_point2', array(
-		'label'   => __( 'Vision — Point 2', 'royal-limo' ),
-		'section' => 'royal_limo_approach',
-		'type'    => 'text',
-	) );
-
-	// Key Persons — About page section header; the cards themselves come
-	// from the "team_member" CPT (variable/admin-manageable count), same
-	// split as Fleet/Services/Testimonials/Blog above.
-	$wp_customize->add_section( 'royal_limo_team', array(
-		'title'    => __( 'Key Persons Section (About Page)', 'royal-limo' ),
-		'priority' => 33,
-	) );
-
-	$wp_customize->add_setting( 'royal_limo_team_eyebrow', array(
-		'default'           => 'Key Persons',
-		'sanitize_callback' => 'sanitize_text_field',
-	) );
-	$wp_customize->add_control( 'royal_limo_team_eyebrow', array(
-		'label'   => __( 'Eyebrow Text', 'royal-limo' ),
-		'section' => 'royal_limo_team',
-		'type'    => 'text',
-	) );
-
-	$wp_customize->add_setting( 'royal_limo_team_heading', array(
-		'default'           => 'Meet the People Behind Every Journey',
-		'sanitize_callback' => 'sanitize_text_field',
-	) );
-	$wp_customize->add_control( 'royal_limo_team_heading', array(
-		'label'   => __( 'Heading', 'royal-limo' ),
-		'section' => 'royal_limo_team',
-		'type'    => 'text',
-	) );
-
-	$wp_customize->add_setting( 'royal_limo_team_description', array(
-		'default'           => 'The experienced team ensuring every ride is punctual, professional, and worry-free.',
-		'sanitize_callback' => 'sanitize_textarea_field',
-	) );
-	$wp_customize->add_control( 'royal_limo_team_description', array(
-		'label'   => __( 'Description', 'royal-limo' ),
-		'section' => 'royal_limo_team',
-		'type'    => 'textarea',
-	) );
-
-	// What We Do — About page section: eyebrow/heading/description, an
-	// image, and 4 fixed feature items (icon per slot is fixed in the
-	// template — only heading/description are editable).
-	$wp_customize->add_section( 'royal_limo_what_we_do', array(
-		'title'    => __( 'What We Do Section (About Page)', 'royal-limo' ),
-		'priority' => 34,
-	) );
-
-	$wp_customize->add_setting( 'royal_limo_what_we_do_eyebrow', array(
-		'default'           => 'What We Do',
-		'sanitize_callback' => 'sanitize_text_field',
-	) );
-	$wp_customize->add_control( 'royal_limo_what_we_do_eyebrow', array(
-		'label'   => __( 'Eyebrow Text', 'royal-limo' ),
-		'section' => 'royal_limo_what_we_do',
-		'type'    => 'text',
-	) );
-
-	$wp_customize->add_setting( 'royal_limo_what_we_do_heading', array(
-		'default'           => 'Your Trusted Chauffeured Travel Partner',
-		'sanitize_callback' => 'sanitize_text_field',
-	) );
-	$wp_customize->add_control( 'royal_limo_what_we_do_heading', array(
-		'label'   => __( 'Heading', 'royal-limo' ),
-		'section' => 'royal_limo_what_we_do',
-		'type'    => 'text',
-	) );
-
-	$wp_customize->add_setting( 'royal_limo_what_we_do_description', array(
-		'default'           => "From the moment you book to the moment you arrive, we handle every detail of the ride so you don't have to.",
-		'sanitize_callback' => 'sanitize_textarea_field',
-	) );
-	$wp_customize->add_control( 'royal_limo_what_we_do_description', array(
-		'label'   => __( 'Description', 'royal-limo' ),
-		'section' => 'royal_limo_what_we_do',
-		'type'    => 'textarea',
-	) );
-
-	$wp_customize->add_setting( 'royal_limo_what_we_do_image', array(
-		'default'           => '',
-		'sanitize_callback' => 'esc_url_raw',
-	) );
-	$wp_customize->add_control( new WP_Customize_Image_Control( $wp_customize, 'royal_limo_what_we_do_image', array(
-		'label'       => __( 'Image', 'royal-limo' ),
-		'description' => __( 'Leave blank to use a stylised placeholder background instead.', 'royal-limo' ),
-		'section'     => 'royal_limo_what_we_do',
-	) ) );
-
-	$what_we_do_defaults = array(
-		1 => array(
-			'heading'     => 'Instant Online Booking',
-			'description' => 'Reserve your chauffeur in minutes with real-time confirmation.',
-		),
-		2 => array(
-			'heading'     => 'Flight-Tracked Pickups',
-			'description' => 'We monitor your flight and adjust pickup times automatically.',
-		),
-		3 => array(
-			'heading'     => 'Flexible Ride Packages',
-			'description' => 'Hourly, point-to-point, or full-day charters to suit your plans.',
-		),
-		4 => array(
-			'heading'     => '24/7 Client Support',
-			'description' => 'A reservations specialist is always available, day or night.',
-		),
-	);
-	foreach ( $what_we_do_defaults as $i => $defaults ) {
-		$wp_customize->add_setting( "royal_limo_what_we_do_{$i}_heading", array(
-			'default'           => $defaults['heading'],
-			'sanitize_callback' => 'sanitize_text_field',
-		) );
-		$wp_customize->add_control( "royal_limo_what_we_do_{$i}_heading", array(
-			'label'   => sprintf( __( 'Feature %d — Heading', 'royal-limo' ), $i ),
-			'section' => 'royal_limo_what_we_do',
-			'type'    => 'text',
-		) );
-
-		$wp_customize->add_setting( "royal_limo_what_we_do_{$i}_description", array(
-			'default'           => $defaults['description'],
-			'sanitize_callback' => 'sanitize_text_field',
-		) );
-		$wp_customize->add_control( "royal_limo_what_we_do_{$i}_description", array(
-			'label'   => sprintf( __( 'Feature %d — Description', 'royal-limo' ), $i ),
-			'section' => 'royal_limo_what_we_do',
-			'type'    => 'text',
-		) );
-	}
+	// Our Approach / Key Persons / What We Do — these used to be
+	// Customizer sections here (About page only, never shared with the
+	// homepage), but moved to page-level meta fields edited directly on
+	// the About page (see royal_limo_register_about_page_meta() in
+	// inc/custom-post-types.php and the sidebar panel in
+	// assets/js/admin-panels.js), so the whole About page is editable
+	// in one place instead of split across wp-admin screens.
 
 	// Accent color.
 	$wp_customize->add_setting( 'royal_limo_accent_color', array(

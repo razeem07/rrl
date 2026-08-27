@@ -1,11 +1,14 @@
 <?php
 /**
- * Homepage "About" section — eyebrow/heading/description, a brand-mark
- * showcase card, and a bottom trust bar with a Google-reviews badge.
- * Content set via Customizer > About Section (royal_limo_about_section()
- * in functions.php).
+ * About page — "About Us" intro section. Same markup/classes as the
+ * homepage's template-parts/about.php (so it looks identical), but a
+ * separate, independently-editable copy: content comes from this
+ * page's own meta fields (edited on the About page itself — see
+ * royal_limo_about_page_intro() in functions.php) instead of the
+ * Customizer, so editing this page never changes the homepage's About
+ * section and vice versa.
  */
-$about = royal_limo_about_section();
+$about = royal_limo_about_page_intro( get_the_ID() );
 ?>
 <section class="rl-about rl-section" id="about">
 	<div class="container">

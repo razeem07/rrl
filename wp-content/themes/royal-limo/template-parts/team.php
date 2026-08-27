@@ -2,8 +2,9 @@
 /**
  * About page "Key Persons" section — eyebrow/heading/description, then
  * a grid of team_member CPT cards (photo, name, role, social links
- * revealed on hover). Content set via Customizer > Key Persons Section
- * and the Team Members admin screen.
+ * revealed on hover). Section text set on the About page itself
+ * (sidebar panel); the people themselves come from the Team Members
+ * admin screen.
  */
 $team_query = new WP_Query( array(
 	'post_type'      => 'team_member',
@@ -12,7 +13,7 @@ $team_query = new WP_Query( array(
 	'order'          => 'ASC',
 	'no_found_rows'  => true,
 ) );
-$team_header = royal_limo_team_section();
+$team_header = royal_limo_team_section( get_the_ID() );
 ?>
 <section class="rl-team rl-section" id="team">
 	<div class="container">

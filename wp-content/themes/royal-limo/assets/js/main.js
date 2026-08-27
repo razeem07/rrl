@@ -48,35 +48,6 @@
 		}
 	} );
 
-	// Category filter tabs (Fleet homepage teaser) — client-side show/
-	// hide by data-categories, no page reload. Cards with no categories
-	// assigned always match "All" but never match a specific filter,
-	// same as leaving a WP post uncategorized.
-	document.querySelectorAll( '[data-rl-filter-group]' ).forEach( function ( group ) {
-		var target = group.parentElement.querySelector( '[data-rl-filter-target]' );
-		if ( ! target ) {
-			return;
-		}
-		var buttons = group.querySelectorAll( '[data-filter]' );
-		var cards = target.children;
-
-		buttons.forEach( function ( button ) {
-			button.addEventListener( 'click', function () {
-				var filter = button.getAttribute( 'data-filter' );
-
-				buttons.forEach( function ( b ) {
-					b.classList.toggle( 'is-active', b === button );
-				} );
-
-				Array.prototype.forEach.call( cards, function ( card ) {
-					var categories = ( card.getAttribute( 'data-categories' ) || '' ).split( ' ' );
-					var matches = 'all' === filter || categories.indexOf( filter ) !== -1;
-					card.style.display = matches ? '' : 'none';
-				} );
-			} );
-		} );
-	} );
-
 	// Testimonial carousel (plain JS, no plugin).
 	document.querySelectorAll( '[data-rl-carousel]' ).forEach( function ( carousel ) {
 		var track = carousel.querySelector( '.rl-testimonial-track' );
@@ -408,5 +379,108 @@
 				}
 			} );
 		} );
+	} );
+
+	// Infinite scroll (Fleet / Services / Blog archives): the sentinel
+	// sits right after the card grid — loading 6 more at a time replaces
+	// numbered pagination. See inc/infinite-scroll.php for the AJAX
+	// handler this calls and the matching PHP that renders the sentinel
+	// only when there's actually more than one page to begin with.
+	document.querySelectorAll( '[data-rl-infinite-sentinel]' ).forEach( function ( sentinel ) {
+		var grid = sentinel.previousElementSibling;
+		if ( ! grid || typeof IntersectionObserver === 'undefined' || typeof royalLimoData === 'undefined' || ! royalLimoData.ajaxUrl ) {
+			sentinel.remove();
+			return;
+		}
+
+		var postType = sentinel.getAttribute( 'data-post-type' );
+		var category = sentinel.getAttribute( 'data-category' ) || '';
+		var paged = parseInt( sentinel.getAttribute( 'data-paged' ), 10 ) || 1;
+		var maxPages = parseInt( sentinel.getAttribute( 'data-max-pages' ), 10 ) || 1;
+		var loading = false;
+		var observer;
+
+		function stop() {
+			if ( observer ) {
+				observer.unobserve( sentinel );
+			}
+			sentinel.remove();
+		}
+
+		function loadMore() {
+			if ( loading || paged >= maxPages ) {
+				return;
+			}
+			loading = true;
+			sentinel.classList.add( 'is-loading' );
+
+			var nextPage = paged + 1;
+			var body = new URLSearchParams();
+			body.set( 'action', 'royal_limo_load_more' );
+			body.set( 'nonce', royalLimoData.infiniteScrollNonce );
+			body.set( 'post_type', postType );
+			body.set( 'category', category );
+			body.set( 'paged', nextPage );
+
+			fetch( royalLimoData.ajaxUrl, {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+				body: body.toString(),
+			} )
+				.then( function ( res ) { return res.json(); } )
+				.then( function ( json ) {
+					if ( ! json || ! json.success || ! json.data || ! json.data.html ) {
+						stop();
+						return;
+					}
+					var temp = document.createElement( 'div' );
+					temp.innerHTML = json.data.html;
+					Array.prototype.slice.call( temp.children ).forEach( function ( child ) {
+						grid.appendChild( child );
+						// animations.css pre-hides every .rl-fleet-card/
+						// .rl-service-card (opacity:0, translated/scaled
+						// down) for GSAP's scroll-reveal to animate in —
+						// but that reveal only scans the grid once, at
+						// page load. Cards added later by infinite scroll
+						// match the same CSS rule and would otherwise
+						// stay invisible forever, which is exactly what
+						// was happening here. Force them visible directly
+						// via inline style, which wins over the class-
+						// based rule regardless of specificity.
+						child.style.opacity = '1';
+						child.style.transform = 'none';
+					} );
+					paged = nextPage;
+					sentinel.setAttribute( 'data-paged', paged );
+					if ( ! json.data.has_more || paged >= maxPages ) {
+						stop();
+					} else {
+						// The grid just grew, pushing the sentinel further
+						// down — if it never actually left the viewport
+						// between loads (e.g. the page was scrolled straight
+						// to the bottom), IntersectionObserver won't fire
+						// again on its own since "isIntersecting" never
+						// changed state. Re-observing forces a fresh check
+						// against its new position.
+						observer.unobserve( sentinel );
+						observer.observe( sentinel );
+					}
+				} )
+				.catch( stop )
+				.finally( function () {
+					loading = false;
+					sentinel.classList.remove( 'is-loading' );
+				} );
+		}
+
+		observer = new IntersectionObserver( function ( entries ) {
+			entries.forEach( function ( entry ) {
+				if ( entry.isIntersecting ) {
+					loadMore();
+				}
+			} );
+		}, { rootMargin: '400px 0px' } );
+
+		observer.observe( sentinel );
 	} );
 } )();

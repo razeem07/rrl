@@ -1,20 +1,20 @@
 <?php
 /**
- * Fleet showcase — pulls from the "fleet" CPT. If Fleet Categories are
- * in use, shows client-side filter tabs above the grid (see
- * [data-rl-filter-group] in assets/js/main.js) — this is a homepage
- * teaser of a limited set of vehicles, not a paginated archive, so
- * instant show/hide is a better fit here than real navigation. The
- * full /fleet/ archive and per-category archives (archive-fleet.php,
- * taxonomy-fleet_category.php) use real linked tabs instead.
+ * Fleet showcase — a homepage teaser of a handful of vehicles from the
+ * "fleet" CPT, ordered the same way the full listing is (menu_order,
+ * with post ID as a tiebreaker). No filter tabs here — the full
+ * category-filterable listing lives at /fleet/ (archive-fleet.php)
+ * and its per-category archives (taxonomy-fleet_category.php); this
+ * section is just a preview with a "View All Fleet" link through to it.
  */
 $fleet_query = new WP_Query( array(
 	'post_type'      => 'fleet',
 	'posts_per_page' => 6,
+	'orderby'        => 'menu_order ID',
+	'order'          => 'ASC',
 	'no_found_rows'  => true,
 ) );
-$fleet_header     = royal_limo_fleet_section();
-$fleet_categories = royal_limo_fleet_categories();
+$fleet_header = royal_limo_fleet_section();
 ?>
 <section class="rl-fleet rl-section" id="fleet">
 	<div class="container">
@@ -30,17 +30,8 @@ $fleet_categories = royal_limo_fleet_categories();
 			</a>
 		</div>
 
-		<?php if ( $fleet_categories ) : ?>
-			<div class="rl-filter-tabs rl-reveal" data-rl-filter-group>
-				<button type="button" class="rl-filter-tabs__btn is-active" data-filter="all"><?php esc_html_e( 'All', 'royal-limo' ); ?></button>
-				<?php foreach ( $fleet_categories as $term ) : ?>
-					<button type="button" class="rl-filter-tabs__btn" data-filter="<?php echo esc_attr( $term->slug ); ?>"><?php echo esc_html( $term->name ); ?></button>
-				<?php endforeach; ?>
-			</div>
-		<?php endif; ?>
-
 		<?php if ( $fleet_query->have_posts() ) : ?>
-			<div class="rl-grid rl-grid--3" data-rl-filter-target>
+			<div class="rl-grid rl-grid--3">
 				<?php while ( $fleet_query->have_posts() ) : $fleet_query->the_post(); ?>
 					<?php get_template_part( 'template-parts/fleet-card' ); ?>
 				<?php endwhile; wp_reset_postdata(); ?>

@@ -2,9 +2,9 @@
 /**
  * About page "What We Do" section — a photo (or stylised fallback) on
  * the left, eyebrow/heading/description + a 2x2 grid of feature items
- * on the right. Content set via Customizer > What We Do Section.
+ * on the right. Content set on the About page itself (sidebar panel).
  */
-$wwd = royal_limo_what_we_do();
+$wwd = royal_limo_what_we_do( get_the_ID() );
 
 $icons = array(
 	// Calendar-check (booking).

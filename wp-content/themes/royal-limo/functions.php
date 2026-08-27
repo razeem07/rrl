@@ -23,6 +23,26 @@ function royal_limo_phone_href( $phone ) {
 }
 
 /**
+ * wa.me click-to-chat link for the floating WhatsApp button — separate
+ * number from the Phone Number field above (Customizer > Contact Info
+ * > WhatsApp Number), with the pre-filled message URL-encoded. wa.me
+ * wants digits only (no leading +), unlike the tel: href above.
+ */
+function royal_limo_whatsapp_url() {
+	$number = get_theme_mod( 'royal_limo_whatsapp_number', '' );
+	if ( ! $number ) {
+		return '';
+	}
+	$digits  = preg_replace( '/[^0-9]/', '', $number );
+	$message = get_theme_mod( 'royal_limo_whatsapp_message', '' );
+	$url     = "https://wa.me/{$digits}";
+	if ( $message ) {
+		$url .= '?text=' . rawurlencode( $message );
+	}
+	return $url;
+}
+
+/**
  * Where "Get a Quote" / "Reserve" buttons should point: the page assigned
  * in Customizer > Contact Info > Booking Page, falling back to the
  * homepage's own quote form if none has been set yet.
@@ -73,11 +93,11 @@ function royal_limo_hero_stats() {
  */
 function royal_limo_service_areas() {
 	$location_defaults = array(
-		1 => 'LAX Airport',
-		2 => 'Downtown LA',
-		3 => 'Beverly Hills',
-		4 => 'Santa Monica',
-		5 => 'Hollywood',
+		1 => 'Dubai Airport',
+		2 => 'Downtown Dubai',
+		3 => 'Dubai Marina',
+		4 => 'Palm Jumeirah',
+		5 => 'Abu Dhabi',
 	);
 
 	$locations = array();
@@ -90,8 +110,8 @@ function royal_limo_service_areas() {
 
 	return array(
 		'eyebrow'     => get_theme_mod( 'royal_limo_service_areas_eyebrow', 'Where We Serve' ),
-		'heading'     => get_theme_mod( 'royal_limo_service_areas_heading', 'Serving You Across Los Angeles' ),
-		'description' => get_theme_mod( 'royal_limo_service_areas_description', 'Enjoy complimentary pickup and drop-off across Los Angeles and the Westside — including LAX, Downtown, Beverly Hills, Santa Monica, and Hollywood. Additional areas available by request.' ),
+		'heading'     => get_theme_mod( 'royal_limo_service_areas_heading', 'Serving You Across the UAE' ),
+		'description' => get_theme_mod( 'royal_limo_service_areas_description', 'Enjoy complimentary pickup and drop-off across Dubai and the wider UAE — including Dubai International Airport, Downtown Dubai, Dubai Marina, Palm Jumeirah, and Abu Dhabi. Additional areas available by request.' ),
 		'locations'   => $locations,
 	);
 }
@@ -109,6 +129,10 @@ function royal_limo_about_section() {
 		'eyebrow'        => get_theme_mod( 'royal_limo_about_eyebrow', 'About Royal Luxury Limousine' ),
 		'heading'        => get_theme_mod( 'royal_limo_about_heading', 'Experience Chauffeured Luxury in Los Angeles with Confidence and Style' ),
 		'description'    => get_theme_mod( 'royal_limo_about_description', $default_description ),
+		// The image control's setting already holds the attachment URL
+		// (see the sanitize_callback note in inc/customizer.php) — use
+		// it as-is, no wp_get_attachment_image_url() lookup needed.
+		'image_url'      => get_theme_mod( 'royal_limo_about_image', '' ),
 		'bar_heading'    => get_theme_mod( 'royal_limo_about_bar_heading', 'Why Book With Us?' ),
 		'bar_text'       => get_theme_mod( 'royal_limo_about_bar_text', 'Top-Rated Chauffeur Service in Los Angeles' ),
 		'reviews_rating' => get_theme_mod( 'royal_limo_about_reviews_rating', '4.9' ),
@@ -148,37 +172,110 @@ function royal_limo_why_choose_us() {
 }
 
 /**
- * The About page "Our Approach" section: eyebrow/heading, an image (or
- * fallback background if left blank), and two editorial blocks (Mission
- * / Vision), each with two checklist points. Content set via
- * Customizer > Our Approach Section.
+ * All content for the About page (page-about.php) is edited directly on
+ * that page (sidebar panel in assets/js/admin-panels.js, meta
+ * registered in inc/custom-post-types.php) rather than the Customizer —
+ * deliberately separate from the homepage's About/Why Choose Us
+ * sections above, so editing one never changes the other. Every
+ * function below takes the About page's post ID explicitly rather than
+ * assuming "the current post", since page-about.php calls these outside
+ * of a the_post() loop in a couple of spots.
  */
-function royal_limo_our_approach() {
+
+/**
+ * About page — "About Us" intro: eyebrow/heading/description, an
+ * image, and the trust bar (heading/tagline/Google rating).
+ */
+function royal_limo_about_page_intro( $post_id ) {
+	$default_description = "Royal Luxury Limousine is a premium chauffeured car service in UAE, offering polished vehicles and professional drivers for customers who expect comfort, discretion, and a smooth ride from pickup to drop-off.\n\nFrom airport transfers to weddings and executive travel, every booking is handled by chauffeurs who know the city and treat every trip like it matters — because to you, it does.\n\nWith fast booking support, a meticulously maintained fleet, and fifteen years of trust behind it, Royal Luxury Limousine has built a reputation that matches Los Angeles' standard for style.";
+
+	$get = function ( $key, $default ) use ( $post_id ) {
+		$value = get_post_meta( $post_id, $key, true );
+		return '' !== $value ? $value : $default;
+	};
+
 	return array(
-		'eyebrow'         => get_theme_mod( 'royal_limo_approach_eyebrow', 'Our Approach' ),
-		'heading'         => get_theme_mod( 'royal_limo_approach_heading', 'Our Approach to Effortless Chauffeured Travel' ),
-		'image_url'       => get_theme_mod( 'royal_limo_approach_image', '' ),
-		'mission_heading' => get_theme_mod( 'royal_limo_approach_mission_heading', 'Our Mission' ),
+		'eyebrow'        => $get( '_about_eyebrow', 'About Royal Luxury Limousine' ),
+		'heading'        => $get( '_about_heading', 'Experience Chauffeured Luxury in UAE with Confidence and Style' ),
+		'description'    => $get( '_about_description', $default_description ),
+		'image_url'      => $get( '_about_image', '' ),
+		'bar_heading'    => $get( '_about_bar_heading', 'Why Book With Us?' ),
+		'bar_text'       => $get( '_about_bar_text', 'Top-Rated Chauffeur Service in UAE' ),
+		'reviews_rating' => $get( '_about_reviews_rating', '4.9' ),
+		'reviews_count'  => $get( '_about_reviews_count', '500+' ),
+		'reviews_url'    => $get( '_about_reviews_url', '' ),
+	);
+}
+
+/**
+ * About page — "Why Choose Us": eyebrow/heading/description plus 4
+ * fixed reason columns (icon is fixed per slot in the template — only
+ * heading/description are editable).
+ */
+function royal_limo_about_page_why_us( $post_id ) {
+	$defaults = array(
+		1 => array( 'heading' => 'Exclusive Fleet', 'description' => 'Hand-picked luxury sedans, SUVs, and limousines for every occasion.' ),
+		2 => array( 'heading' => 'Licensed & Insured', 'description' => 'Every vehicle and chauffeur meets rigorous safety and licensing standards.' ),
+		3 => array( 'heading' => 'Client First', 'description' => 'Your comfort, privacy, and satisfaction are always our top priority.' ),
+		4 => array( 'heading' => 'Citywide Service', 'description' => 'Reliable pickup and drop-off availability across Los Angeles and beyond.' ),
+	);
+
+	$get = function ( $key, $default ) use ( $post_id ) {
+		$value = get_post_meta( $post_id, $key, true );
+		return '' !== $value ? $value : $default;
+	};
+
+	$reasons = array();
+	for ( $i = 1; $i <= 4; $i++ ) {
+		$reasons[] = array(
+			'heading'     => $get( "_why_us_{$i}_heading", $defaults[ $i ]['heading'] ),
+			'description' => $get( "_why_us_{$i}_description", $defaults[ $i ]['description'] ),
+		);
+	}
+
+	return array(
+		'eyebrow'     => $get( '_why_us_eyebrow', 'Why Choose Us' ),
+		'heading'     => $get( '_why_us_heading', 'The Royal Luxury Difference' ),
+		'description' => $get( '_why_us_description', 'What sets a Royal Luxury ride apart, from the moment you book to the moment you arrive.' ),
+		'reasons'     => $reasons,
+	);
+}
+
+/**
+ * About page — "Our Approach": eyebrow/heading, an image (or fallback
+ * background if left blank), and two editorial blocks (Mission /
+ * Vision), each with two checklist points.
+ */
+function royal_limo_our_approach( $post_id ) {
+	$get = function ( $key, $default ) use ( $post_id ) {
+		$value = get_post_meta( $post_id, $key, true );
+		return '' !== $value ? $value : $default;
+	};
+
+	return array(
+		'eyebrow'         => $get( '_approach_eyebrow', 'Our Approach' ),
+		'heading'         => $get( '_approach_heading', 'Our Approach to Effortless Chauffeured Travel' ),
+		'image_url'       => $get( '_approach_image', '' ),
+		'mission_heading' => $get( '_approach_mission_heading', 'Our Mission' ),
 		'mission_points'  => array(
-			get_theme_mod( 'royal_limo_approach_mission_point1', 'Deliver reliable, punctual transportation on every single trip' ),
-			get_theme_mod( 'royal_limo_approach_mission_point2', 'Treat every rider with the same care and discretion as our first' ),
+			$get( '_approach_mission_point1', 'Deliver reliable, punctual transportation on every single trip' ),
+			$get( '_approach_mission_point2', 'Treat every rider with the same care and discretion as our first' ),
 		),
-		'vision_heading'  => get_theme_mod( 'royal_limo_approach_vision_heading', 'Our Vision' ),
+		'vision_heading'  => $get( '_approach_vision_heading', 'Our Vision' ),
 		'vision_points'   => array(
-			get_theme_mod( 'royal_limo_approach_vision_point1', 'Set the standard for luxury chauffeured travel in Los Angeles' ),
-			get_theme_mod( 'royal_limo_approach_vision_point2', 'Build lasting trust with every client, one journey at a time' ),
+			$get( '_approach_vision_point1', 'Set the standard for luxury chauffeured travel in Los Angeles' ),
+			$get( '_approach_vision_point2', 'Build lasting trust with every client, one journey at a time' ),
 		),
 	);
 }
 
 /**
- * The About page "What We Do" section: eyebrow/heading/description, an
- * image (or fallback background if left blank), and 4 fixed feature
- * items (icon is fixed per slot in the template — only heading/
- * description are editable). Content set via Customizer > What We Do
- * Section.
+ * About page — "What We Do": eyebrow/heading/description, an image (or
+ * fallback background if left blank), and 4 fixed feature items (icon
+ * is fixed per slot in the template — only heading/description are
+ * editable).
  */
-function royal_limo_what_we_do() {
+function royal_limo_what_we_do( $post_id ) {
 	$defaults = array(
 		1 => array( 'heading' => 'Instant Online Booking', 'description' => 'Reserve your chauffeur in minutes with real-time confirmation.' ),
 		2 => array( 'heading' => 'Flight-Tracked Pickups', 'description' => 'We monitor your flight and adjust pickup times automatically.' ),
@@ -186,33 +283,43 @@ function royal_limo_what_we_do() {
 		4 => array( 'heading' => '24/7 Client Support', 'description' => 'A reservations specialist is always available, day or night.' ),
 	);
 
+	$get = function ( $key, $default ) use ( $post_id ) {
+		$value = get_post_meta( $post_id, $key, true );
+		return '' !== $value ? $value : $default;
+	};
+
 	$features = array();
 	for ( $i = 1; $i <= 4; $i++ ) {
 		$features[] = array(
-			'heading'     => get_theme_mod( "royal_limo_what_we_do_{$i}_heading", $defaults[ $i ]['heading'] ),
-			'description' => get_theme_mod( "royal_limo_what_we_do_{$i}_description", $defaults[ $i ]['description'] ),
+			'heading'     => $get( "_wwd_{$i}_heading", $defaults[ $i ]['heading'] ),
+			'description' => $get( "_wwd_{$i}_description", $defaults[ $i ]['description'] ),
 		);
 	}
 
 	return array(
-		'eyebrow'     => get_theme_mod( 'royal_limo_what_we_do_eyebrow', 'What We Do' ),
-		'heading'     => get_theme_mod( 'royal_limo_what_we_do_heading', 'Your Trusted Chauffeured Travel Partner' ),
-		'description' => get_theme_mod( 'royal_limo_what_we_do_description', "From the moment you book to the moment you arrive, we handle every detail of the ride so you don't have to." ),
-		'image_url'   => get_theme_mod( 'royal_limo_what_we_do_image', '' ),
+		'eyebrow'     => $get( '_wwd_eyebrow', 'What We Do' ),
+		'heading'     => $get( '_wwd_heading', 'Your Trusted Chauffeured Travel Partner' ),
+		'description' => $get( '_wwd_description', "From the moment you book to the moment you arrive, we handle every detail of the ride so you don't have to." ),
+		'image_url'   => $get( '_wwd_image', '' ),
 		'features'    => $features,
 	);
 }
 
 /**
- * "Key Persons" / team section header (eyebrow/heading/description) —
- * the cards themselves come straight from the "team_member" CPT in the
- * template.
+ * About page — "Key Persons" / team section header (eyebrow/heading/
+ * description) — the cards themselves come straight from the
+ * "team_member" CPT in the template.
  */
-function royal_limo_team_section() {
+function royal_limo_team_section( $post_id ) {
+	$get = function ( $key, $default ) use ( $post_id ) {
+		$value = get_post_meta( $post_id, $key, true );
+		return '' !== $value ? $value : $default;
+	};
+
 	return array(
-		'eyebrow'     => get_theme_mod( 'royal_limo_team_eyebrow', 'Key Persons' ),
-		'heading'     => get_theme_mod( 'royal_limo_team_heading', 'Meet the People Behind Every Journey' ),
-		'description' => get_theme_mod( 'royal_limo_team_description', 'The experienced team ensuring every ride is punctual, professional, and worry-free.' ),
+		'eyebrow'     => $get( '_team_eyebrow', 'Key Persons' ),
+		'heading'     => $get( '_team_heading', 'Meet the People Behind Every Journey' ),
+		'description' => $get( '_team_description', 'The experienced team ensuring every ride is punctual, professional, and worry-free.' ),
 	);
 }
 
@@ -255,6 +362,7 @@ function royal_limo_fleet_section() {
 		'eyebrow'     => get_theme_mod( 'royal_limo_fleet_eyebrow', 'Our Collection' ),
 		'heading'     => get_theme_mod( 'royal_limo_fleet_heading', 'Featured Luxury Fleet' ),
 		'description' => get_theme_mod( 'royal_limo_fleet_description', 'Explore a hand-selected range of executive sedans, SUVs, and stretch limousines — each maintained to the highest standard and ready for your next reservation.' ),
+		'image_url'   => get_theme_mod( 'royal_limo_fleet_banner_image', '' ),
 	);
 }
 
@@ -281,6 +389,10 @@ function royal_limo_services_section() {
 		'eyebrow'     => get_theme_mod( 'royal_limo_services_eyebrow', 'What We Offer' ),
 		'heading'     => get_theme_mod( 'royal_limo_services_heading', 'Services Built Around You' ),
 		'description' => get_theme_mod( 'royal_limo_services_description', 'From airport transfers to weddings and corporate travel, explore the chauffeured services designed to fit every occasion.' ),
+		// The image control's setting already holds the attachment URL
+		// (see the sanitize_callback note in inc/customizer.php) — use
+		// it as-is, no wp_get_attachment_image_url() lookup needed.
+		'image_url'   => get_theme_mod( 'royal_limo_services_banner_image', '' ),
 	);
 }
 
@@ -305,6 +417,7 @@ function royal_limo_blog_section() {
 		'eyebrow'     => get_theme_mod( 'royal_limo_blog_eyebrow', 'Latest Blogs' ),
 		'heading'     => get_theme_mod( 'royal_limo_blog_heading', 'Insights and Stories That Drive' ),
 		'description' => get_theme_mod( 'royal_limo_blog_description', 'Discover expert tips, helpful advice, and inspiring stories designed to make every journey smarter, smoother, and more enjoyable.' ),
+		'image_url'   => get_theme_mod( 'royal_limo_blog_banner_image', '' ),
 	);
 }
 
@@ -435,7 +548,8 @@ function royal_limo_assets() {
 	wp_enqueue_script( 'royal-limo-animations', $js_dir . 'animations.js', array( 'gsap', 'gsap-scrolltrigger' ), royal_limo_asset_version( '/assets/js/animations.js' ), true );
 
 	wp_localize_script( 'royal-limo-main', 'royalLimoData', array(
-		'ajaxUrl' => admin_url( 'admin-ajax.php' ),
+		'ajaxUrl'             => admin_url( 'admin-ajax.php' ),
+		'infiniteScrollNonce' => wp_create_nonce( 'royal_limo_infinite_scroll' ),
 	) );
 }
 add_action( 'wp_enqueue_scripts', 'royal_limo_assets' );
@@ -454,8 +568,13 @@ add_filter( 'script_loader_tag', 'royal_limo_defer_scripts', 10, 2 );
 
 /**
  * Native block-editor sidebar panels for the Fleet/Testimonial/Banner/
- * Service custom fields (assets/js/admin-panels.js), replacing the old
- * classic meta boxes. Only loaded on those post types' editor screens.
+ * Service/Team Member custom fields and the About page's content
+ * (assets/js/admin-panels.js), replacing the old classic meta boxes.
+ * Only loaded on those post types' editor screens — 'page' is included
+ * for every page (not just the About page) since there's no cheap way
+ * to check a page's assigned template this early; admin-panels.js
+ * itself only renders the About Page Content panel when the template
+ * actually matches, so this is harmless for every other page.
  */
 function royal_limo_admin_assets( $hook ) {
 	if ( 'post.php' !== $hook && 'post-new.php' !== $hook ) {
@@ -463,7 +582,7 @@ function royal_limo_admin_assets( $hook ) {
 	}
 
 	$screen = get_current_screen();
-	if ( ! $screen || ! in_array( $screen->post_type, array( 'fleet', 'testimonial', 'banner', 'service' ), true ) ) {
+	if ( ! $screen || ! in_array( $screen->post_type, array( 'fleet', 'testimonial', 'banner', 'service', 'team_member', 'page' ), true ) ) {
 		return;
 	}
 
@@ -481,3 +600,4 @@ require ROYAL_LIMO_DIR . '/inc/custom-post-types.php';
 require ROYAL_LIMO_DIR . '/inc/customizer.php';
 require ROYAL_LIMO_DIR . '/inc/cf7-integration.php';
 require ROYAL_LIMO_DIR . '/inc/quote-form.php';
+require ROYAL_LIMO_DIR . '/inc/infinite-scroll.php';

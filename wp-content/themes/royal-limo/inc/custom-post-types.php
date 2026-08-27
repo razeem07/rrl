@@ -20,7 +20,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * that one classic box, on these post types only.
  */
 function royal_limo_hide_classic_custom_fields_box() {
-	foreach ( array( 'fleet', 'testimonial', 'banner', 'service', 'team_member' ) as $post_type ) {
+	foreach ( array( 'fleet', 'testimonial', 'banner', 'service', 'team_member', 'page' ) as $post_type ) {
 		remove_meta_box( 'postcustom', $post_type, 'normal' );
 	}
 }
@@ -86,18 +86,29 @@ function royal_limo_register_fleet_meta() {
 		'sanitize_callback' => 'absint',
 		'auth_callback'     => $auth_callback,
 	) );
+	// sanitize_callback is called as apply_filters( ..., $value, $meta_key,
+	// $object_type, $object_subtype ) — 4 args. floatval() is a strict-
+	// arity PHP builtin (only accepts 1 argument) and PHP 8+ throws an
+	// uncaught ArgumentCountError when it's passed the extra 3, crashing
+	// the whole REST update with a 500 ("update failed" in the editor).
+	// absint() elsewhere in this file is a WP-defined userland function,
+	// so it silently ignores the extra args and doesn't have this problem
+	// — only bare PHP-internal function names as callbacks are at risk.
+	$sanitize_price = function ( $value ) {
+		return floatval( $value );
+	};
 	register_post_meta( 'fleet', '_fleet_price_full_day', array(
 		'show_in_rest'      => true,
 		'single'            => true,
 		'type'              => 'number',
-		'sanitize_callback' => 'floatval',
+		'sanitize_callback' => $sanitize_price,
 		'auth_callback'     => $auth_callback,
 	) );
 	register_post_meta( 'fleet', '_fleet_price_half_day', array(
 		'show_in_rest'      => true,
 		'single'            => true,
 		'type'              => 'number',
-		'sanitize_callback' => 'floatval',
+		'sanitize_callback' => $sanitize_price,
 		'auth_callback'     => $auth_callback,
 	) );
 	register_post_meta( 'fleet', '_fleet_specs', array(
@@ -736,4 +747,117 @@ function royal_limo_faq_title_placeholder( $title, $post ) {
 	}
 	return $title;
 }
+
+/* ==========================================================================
+   About page content (page-about.php) — every section on this page is
+   editable from the page's own edit screen (sidebar panel in
+   admin-panels.js) instead of the Customizer. Registered on the 'page'
+   post type generally (simplest — 'page' has no per-template meta
+   scoping), but the sidebar panel itself only renders these fields
+   when editing a page using the "About Us" template, and no other page
+   template reads them, so it's harmless for every other page on the
+   site. Deliberately separate from the homepage's "About"/"Why Choose
+   Us" Customizer sections (royal_limo_about_section() /
+   royal_limo_why_choose_us() in functions.php) rather than sharing
+   them — editing this page's content must not also change the
+   homepage's.
+   ========================================================================== */
+
+function royal_limo_register_about_page_meta() {
+	$auth_callback = function () {
+		return current_user_can( 'edit_pages' );
+	};
+
+	$text_fields = array(
+		// Banner.
+		'_about_banner_image',
+		// About Us intro.
+		'_about_eyebrow',
+		'_about_heading',
+		'_about_image',
+		'_about_bar_heading',
+		'_about_bar_text',
+		'_about_reviews_rating',
+		'_about_reviews_count',
+		'_about_reviews_url',
+		// Our Approach.
+		'_approach_eyebrow',
+		'_approach_heading',
+		'_approach_image',
+		'_approach_mission_heading',
+		'_approach_mission_point1',
+		'_approach_mission_point2',
+		'_approach_vision_heading',
+		'_approach_vision_point1',
+		'_approach_vision_point2',
+		// Why Choose Us.
+		'_why_us_eyebrow',
+		'_why_us_heading',
+		// Key Persons.
+		'_team_eyebrow',
+		'_team_heading',
+		// What We Do.
+		'_wwd_eyebrow',
+		'_wwd_heading',
+		'_wwd_image',
+	);
+
+	for ( $i = 1; $i <= 4; $i++ ) {
+		$text_fields[] = "_why_us_{$i}_heading";
+		$text_fields[] = "_why_us_{$i}_description";
+		$text_fields[] = "_wwd_{$i}_heading";
+		$text_fields[] = "_wwd_{$i}_description";
+	}
+
+	// URL-type fields get esc_url_raw; the image fields are included
+	// here too since (same note as elsewhere in this theme)
+	// WP_Customize_Image_Control-style pickers store a URL, and the
+	// MediaUpload equivalent in the sidebar panel does the same.
+	$url_fields = array( '_about_banner_image', '_about_image', '_about_reviews_url', '_approach_image', '_wwd_image' );
+
+	foreach ( $text_fields as $key ) {
+		register_post_meta( 'page', $key, array(
+			'show_in_rest'      => true,
+			'single'            => true,
+			'type'              => 'string',
+			'sanitize_callback' => in_array( $key, $url_fields, true ) ? 'esc_url_raw' : 'sanitize_text_field',
+			'auth_callback'     => $auth_callback,
+		) );
+	}
+
+	// These "description" fields are longer-form than the rest —
+	// sanitize as textarea (preserves line breaks) instead of the
+	// single-line text_field used for everything else above.
+	foreach ( array( '_about_description', '_why_us_description', '_wwd_description', '_team_description' ) as $key ) {
+		register_post_meta( 'page', $key, array(
+			'show_in_rest'      => true,
+			'single'            => true,
+			'type'              => 'string',
+			'sanitize_callback' => 'sanitize_textarea_field',
+			'auth_callback'     => $auth_callback,
+		) );
+	}
+}
+add_action( 'init', 'royal_limo_register_about_page_meta' );
+
+/* ==========================================================================
+   Contact page banner (page-contact.php) — a single image field, edited
+   directly on the page instead of the Customizer, since the Contact
+   page is a real editable page (unlike the Fleet/Services/Blog listing
+   pages above, which are CPT archives/template slots with no page-
+   editor screen of their own to attach a field to).
+   ========================================================================== */
+
+function royal_limo_register_contact_page_meta() {
+	register_post_meta( 'page', '_contact_banner_image', array(
+		'show_in_rest'      => true,
+		'single'            => true,
+		'type'              => 'string',
+		'sanitize_callback' => 'esc_url_raw',
+		'auth_callback'     => function () {
+			return current_user_can( 'edit_pages' );
+		},
+	) );
+}
+add_action( 'init', 'royal_limo_register_contact_page_meta' );
 add_filter( 'enter_title_here', 'royal_limo_faq_title_placeholder', 10, 2 );

@@ -2,9 +2,9 @@
 /**
  * About page "Our Approach" section — eyebrow/heading + Mission/Vision
  * editorial blocks on the left, a photo (or stylised fallback) on the
- * right. Content set via Customizer > Our Approach Section.
+ * right. Content set on the About page itself (sidebar panel).
  */
-$approach = royal_limo_our_approach();
+$approach = royal_limo_our_approach( get_the_ID() );
 ?>
 <section class="rl-approach rl-section" id="approach">
 	<div class="container">
