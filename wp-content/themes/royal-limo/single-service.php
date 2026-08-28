@@ -86,7 +86,7 @@ while ( have_posts() ) :
 	}
 	?>
 
-	<section class="rl-page-header rl-reveal" <?php if ( $banner_image_url ) : ?>style="background-image: url('<?php echo esc_url( $banner_image_url ); ?>');"<?php endif; ?>>
+	<section class="rl-page-header rl-reveal" <?php if ( $banner_image_url ) : ?>style="background-image: linear-gradient(180deg, rgba(10, 10, 10, .55) 0%, rgba(10, 10, 10, .8) 100%), url('<?php echo esc_url( $banner_image_url ); ?>');"<?php endif; ?>>
 		<div class="rl-page-header__inner">
 			<h1><?php the_title(); ?></h1>
 			<nav class="rl-breadcrumb" aria-label="<?php esc_attr_e( 'Breadcrumb', 'royal-limo' ); ?>">

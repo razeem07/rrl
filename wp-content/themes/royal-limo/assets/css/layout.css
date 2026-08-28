@@ -1741,70 +1741,105 @@ body.rl-modal-open {
 	margin: 0;
 }
 
-/* ---- Contact Form 7 integration ----
-   The .rl-quote-form/.rl-quote-form__row/.rl-input classes above are
-   applied directly to CF7's own tags (see the form created for
-   royal_limo_quote_shortcode), so the grid/spacing rules already
-   match. CF7 additionally wraps every field in its own
-   .wpcf7-form-control-wrap span and injects a response banner after
-   submit — those need their own rules since they're not part of our
-   markup. */
-.wpcf7-form-control-wrap {
+/* ---- Forminator integration ----
+   Forminator renders its own markup (.forminator-row/.forminator-field/
+   .forminator-input etc.), unlike the old CF7 setup where our own
+   .rl-quote-form/.rl-input classes were baked directly into the form
+   template. Rather than fight to disable Forminator's stylesheet (its
+   JS validation/AJAX submit relies on some of those classes/states),
+   these rules re-skin its real class names to match the neumorphic/
+   glass look used everywhere else. */
+.forminator-custom-form .forminator-row {
+	display: flex;
+	flex-wrap: wrap;
+	gap: var(--space-sm);
+	margin: 0 0 var(--space-sm);
+}
+
+.forminator-custom-form .forminator-col {
+	flex: 1 1 220px;
+	min-width: 0;
+}
+
+.forminator-custom-form .forminator-label {
 	display: block;
-	width: 100%;
+	margin-bottom: 0.35rem;
+	font-size: 0.85rem;
+	color: var(--text-muted);
 }
 
-.wpcf7-not-valid-tip {
-	display: block;
-	margin-top: 0.35rem;
-	color: #ff8080;
-	font-size: 0.8rem;
+.forminator-custom-form .forminator-required {
+	color: var(--gold);
 }
 
-/* CF7's a11y live-region — hidden visually like WP core's .screen-reader-text,
-   otherwise it renders as a visible empty box above the form fields. */
-.screen-reader-response {
-	position: absolute;
-	width: 1px;
-	height: 1px;
-	overflow: hidden;
-	clip: rect(1px, 1px, 1px, 1px);
-	white-space: nowrap;
+.forminator-custom-form .forminator-input,
+.forminator-custom-form .forminator-textarea,
+.forminator-custom-form select.forminator-select {
+	width: 100% !important;
+	padding: 0.85rem 1.1rem !important;
+	border: none !important;
+	border-radius: var(--radius-sm) !important;
+	background: var(--surface) !important;
+	color: var(--text-light) !important;
+	font-family: inherit !important;
+	font-size: 0.95rem !important;
+	box-shadow:
+		inset 3px 3px 6px var(--neu-dark),
+		inset -3px -3px 6px var(--neu-light) !important;
 }
 
-.wpcf7-response-output {
+.forminator-custom-form .forminator-input::placeholder,
+.forminator-custom-form .forminator-textarea::placeholder {
+	color: var(--text-muted) !important;
+}
+
+.forminator-custom-form .forminator-input:focus,
+.forminator-custom-form .forminator-textarea:focus,
+.forminator-custom-form select.forminator-select:focus {
+	outline: 2px solid var(--gold) !important;
+	outline-offset: 2px;
+	box-shadow: none !important;
+}
+
+.forminator-custom-form .forminator-button-submit {
+	padding: 0.9rem 2rem !important;
+	border: none !important;
+	border-radius: var(--radius-pill) !important;
+	background: var(--gold) !important;
+	color: var(--bg-black-soft) !important;
+	font-weight: 600 !important;
+	cursor: pointer;
+	box-shadow:
+		3px 3px 6px var(--neu-dark),
+		-3px -3px 6px var(--neu-light) !important;
+}
+
+.forminator-custom-form .forminator-button-submit:hover {
+	filter: brightness(1.08);
+}
+
+.forminator-custom-form div.forminator-response-message {
 	margin: var(--space-sm) 0 0 !important;
 	padding: 0.75rem 1rem !important;
 	border-radius: var(--radius-sm) !important;
 	border: 1px solid var(--glass-border) !important;
-	color: var(--text-light);
+	color: var(--text-light) !important;
 	font-size: 0.9rem;
 }
 
-.wpcf7-response-output:empty {
+.forminator-custom-form div.forminator-response-message:empty,
+.forminator-custom-form div.forminator-response-message[aria-hidden="true"] {
 	display: none;
 }
 
-/* CF7 wraps its hidden nonce/meta fields in a <fieldset>, which the
-   browser renders with a default border+padding once CF7's own
-   stylesheet is disabled (we style everything else ourselves). */
-.hidden-fields-container {
-	display: none;
-}
-
-.wpcf7-mail-sent-ok {
-	border-color: #4caf7d !important;
+.forminator-custom-form div.forminator-response-message.forminator-success {
+	border-color: #4caf7d;
 	color: #8fe3b8;
 }
 
-.wpcf7-validation-errors,
-.wpcf7-mail-sent-ng {
-	border-color: #e05656 !important;
+.forminator-custom-form div.forminator-response-message.forminator-error {
+	border-color: #e05656;
 	color: #ff9d9d;
-}
-
-.wpcf7-spinner {
-	margin-left: 0.5rem;
 }
 
 /* ---- Footer ---- */
@@ -1816,7 +1851,7 @@ body.rl-modal-open {
 
 .site-footer__inner {
 	display: grid;
-	grid-template-columns: 1.3fr 1fr 1fr;
+	grid-template-columns: 1.3fr 1fr 1fr 1fr;
 	gap: var(--space-lg);
 	padding-bottom: var(--space-xl);
 }
@@ -1827,10 +1862,17 @@ body.rl-modal-open {
 	margin-bottom: var(--space-sm);
 }
 
+.site-footer__col--brand .site-footer__heading {
+	margin-top: var(--space-md);
+}
+
 .site-footer__list {
 	display: flex;
 	flex-direction: column;
 	gap: 0.6rem;
+	list-style: none;
+	margin: 0;
+	padding: 0;
 }
 
 .site-footer__list a:hover {
@@ -1843,8 +1885,110 @@ body.rl-modal-open {
 	margin-top: var(--space-sm);
 }
 
+.site-footer__social-icon {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 32px;
+	height: 32px;
+	border-radius: 50%;
+	background: var(--glass-bg-strong);
+	border: 1px solid var(--glass-border);
+	color: var(--text-light);
+	transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+.site-footer__social-icon:hover {
+	background: var(--gold);
+	border-color: var(--gold);
+	color: var(--bg-black-soft);
+}
+
 .site-footer__tagline {
 	max-width: 32ch;
+}
+
+.site-footer__address,
+.site-footer__hours {
+	color: var(--text-muted);
+	margin: 0 0 var(--space-sm);
+	max-width: 32ch;
+}
+
+.site-footer__hours-label {
+	color: var(--text-light);
+	font-weight: 600;
+	margin: 0 0 0.25rem;
+}
+
+.site-footer__contact-list {
+	list-style: none;
+	margin: 0 0 var(--space-sm);
+	padding: 0;
+	display: flex;
+	flex-direction: column;
+	gap: 0.7rem;
+}
+
+.site-footer__contact-list li {
+	display: flex;
+	align-items: center;
+	gap: 0.6rem;
+}
+
+.site-footer__contact-list a:hover {
+	color: var(--gold);
+}
+
+.site-footer__contact-icon {
+	display: flex;
+	flex: 0 0 auto;
+	color: var(--gold);
+}
+
+.site-footer__payments {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.5rem;
+	margin-top: var(--space-md);
+}
+
+.site-footer__payment-badge {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	padding: 0.3rem 0.65rem;
+	border-radius: var(--radius-sm);
+	background: #fff;
+	font-size: 0.7rem;
+	font-weight: 700;
+	letter-spacing: 0.02em;
+	line-height: 1;
+}
+
+.site-footer__payment-badge--paypal {
+	color: #003087;
+}
+
+.site-footer__payment-badge--visa {
+	color: #1a1f71;
+	font-style: italic;
+}
+
+.site-footer__payment-badge--amex {
+	color: #2e77bb;
+}
+
+.site-footer__payment-badge--maestro {
+	color: #cc0000;
+}
+
+.site-footer__payment-img {
+	height: 40px;
+	width: auto;
+	border-radius: var(--radius-sm);
+	background: #fff;
+	padding: 0.3rem 0.6rem;
 }
 
 .site-footer__bottom {
@@ -2126,6 +2270,18 @@ a.rl-reviews-badge:hover .rl-reviews-badge__count {
 	background-image: linear-gradient(180deg, rgba(10, 10, 10, .55) 0%, rgba(10, 10, 10, .8) 100%);
 	background-size: cover;
 	background-position: center;
+}
+
+/* Banner images are wide (~3:1) for a good desktop crop, but the
+   full-size padding alone (2x --space-2xl) makes this section nearly
+   square at phone widths — background-size:cover then zooms into a
+   tight center sliver of the image instead of showing it properly.
+   Shrinking the padding keeps the box landscape-ish so cover crops
+   much less aggressively. */
+@media (max-width: 640px) {
+	.rl-page-header {
+		padding: var(--space-lg) var(--space-md);
+	}
 }
 
 .rl-page-header__inner {
@@ -2500,6 +2656,14 @@ a.rl-reviews-badge:hover .rl-reviews-badge__count {
 	color: var(--text-light);
 }
 
+.rl-single-fleet__specline--sidebar {
+	margin: 0 0 var(--space-md);
+	padding-top: var(--space-sm);
+	border-top: 1px solid var(--glass-border);
+	font-size: 0.85rem;
+	line-height: 1.5;
+}
+
 .rl-fleet-gallery {
 	position: relative;
 	border-radius: var(--radius-lg);
@@ -2851,6 +3015,10 @@ a.rl-reviews-badge:hover .rl-reviews-badge__count {
 }
 
 /* ---- About page: Key Persons (team) ---- */
+.rl-team-card {
+	text-align: center;
+}
+
 .rl-team-card__media {
 	position: relative;
 	aspect-ratio: 4 / 5;

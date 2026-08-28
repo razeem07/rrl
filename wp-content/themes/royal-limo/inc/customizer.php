@@ -66,6 +66,27 @@ function royal_limo_customize_register( $wp_customize ) {
 		'type'    => 'text',
 	) );
 
+	$wp_customize->add_setting( 'royal_limo_operating_hours', array(
+		'default'           => ROYAL_LIMO_DEFAULT_OPERATING_HOURS,
+		'sanitize_callback' => 'sanitize_text_field',
+	) );
+	$wp_customize->add_control( 'royal_limo_operating_hours', array(
+		'label'   => __( 'Operating Hours', 'royal-limo' ),
+		'section' => 'royal_limo_contact',
+		'type'    => 'text',
+	) );
+
+	$wp_customize->add_setting( 'royal_limo_map_embed_url', array(
+		'default'           => '',
+		'sanitize_callback' => 'esc_url_raw',
+	) );
+	$wp_customize->add_control( 'royal_limo_map_embed_url', array(
+		'label'       => __( 'Google Maps Embed URL', 'royal-limo' ),
+		'description' => __( 'From Google Maps: Share > Embed a map > copy the src="…" URL. Leave blank to fall back to a plain pin generated from the Address field above.', 'royal-limo' ),
+		'section'     => 'royal_limo_contact',
+		'type'        => 'url',
+	) );
+
 	$wp_customize->add_setting( 'royal_limo_booking_page_id', array(
 		'default'           => 0,
 		'sanitize_callback' => 'absint',
@@ -76,6 +97,26 @@ function royal_limo_customize_register( $wp_customize ) {
 		'section'     => 'royal_limo_contact',
 		'type'        => 'dropdown-pages',
 	) );
+
+	$payment_methods = array(
+		'paypal'  => __( 'PayPal', 'royal-limo' ),
+		'visa'    => __( 'Visa', 'royal-limo' ),
+		'amex'    => __( 'Amex', 'royal-limo' ),
+		'maestro' => __( 'Maestro', 'royal-limo' ),
+	);
+	foreach ( $payment_methods as $key => $label ) {
+		$wp_customize->add_setting( "royal_limo_payment_icon_{$key}", array(
+			'default'           => '',
+			// See the note on royal_limo_video_image above — this control
+			// stores a URL, not an attachment ID.
+			'sanitize_callback' => 'esc_url_raw',
+		) );
+		$wp_customize->add_control( new WP_Customize_Image_Control( $wp_customize, "royal_limo_payment_icon_{$key}", array(
+			'label'       => sprintf( __( 'Payment Icon — %s', 'royal-limo' ), $label ),
+			'description' => __( 'Shown in the footer\'s payment methods row. Leave blank to show a plain text badge instead.', 'royal-limo' ),
+			'section'     => 'royal_limo_contact',
+		) ) );
+	}
 
 	$wp_customize->add_setting( 'royal_limo_quote_shortcode', array(
 		'default'           => '',
@@ -88,13 +129,19 @@ function royal_limo_customize_register( $wp_customize ) {
 		'type'        => 'text',
 	) );
 
-	foreach ( array( 'facebook', 'instagram', 'x' ) as $network ) {
+	$social_labels = array(
+		'facebook'  => 'Facebook',
+		'instagram' => 'Instagram',
+		'linkedin'  => 'LinkedIn',
+		'x'         => 'X (Twitter)',
+	);
+	foreach ( $social_labels as $network => $label ) {
 		$wp_customize->add_setting( "royal_limo_social_{$network}", array(
 			'default'           => '',
 			'sanitize_callback' => 'esc_url_raw',
 		) );
 		$wp_customize->add_control( "royal_limo_social_{$network}", array(
-			'label'   => sprintf( __( '%s URL', 'royal-limo' ), ucfirst( $network ) ),
+			'label'   => sprintf( __( '%s URL', 'royal-limo' ), $label ),
 			'section' => 'royal_limo_contact',
 			'type'    => 'url',
 		) );

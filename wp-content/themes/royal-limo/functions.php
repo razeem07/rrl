@@ -11,6 +11,7 @@ define( 'ROYAL_LIMO_VERSION', '1.0.0' );
 define( 'ROYAL_LIMO_DIR', get_template_directory() );
 define( 'ROYAL_LIMO_URI', get_template_directory_uri() );
 define( 'ROYAL_LIMO_DEFAULT_PHONE', '+1 (555) 010-2026' );
+define( 'ROYAL_LIMO_DEFAULT_OPERATING_HOURS', 'Monday - Sunday : 24/7 Available' );
 define( 'ROYAL_LIMO_DEFAULT_HERO_SUBHEADING', 'Premium chauffeured limousines for airport transfers, weddings, corporate travel and nights out.' );
 define( 'ROYAL_LIMO_DEFAULT_EYEBROW', 'Experience The Road In Style' );
 
@@ -19,6 +20,19 @@ define( 'ROYAL_LIMO_DEFAULT_EYEBROW', 'Experience The Road In Style' );
  * digits and a leading +, since get_theme_mod() values are free text.
  */
 function royal_limo_phone_href( $phone ) {
+	// Vanity numbers like "800-ALTAJ (800 25825)" show a letter-based
+	// mnemonic alongside the actual dialable digits in parentheses —
+	// stripping non-digits from the whole string would double-count
+	// digits appearing both outside and inside the parens. When the
+	// text outside the parens contains letters (a strong signal this
+	// is a vanity number, since a real number's parens are just area-
+	// code grouping, e.g. "+1 (555) 010-2026"), dial only what's inside.
+	if ( preg_match( '/\(([^)]+)\)/', $phone, $matches ) ) {
+		$outside = trim( str_replace( $matches[0], '', $phone ) );
+		if ( preg_match( '/[a-zA-Z]/', $outside ) ) {
+			$phone = $matches[1];
+		}
+	}
 	return 'tel:' . preg_replace( '/[^0-9+]/', '', $phone );
 }
 
@@ -582,7 +596,7 @@ function royal_limo_admin_assets( $hook ) {
 	}
 
 	$screen = get_current_screen();
-	if ( ! $screen || ! in_array( $screen->post_type, array( 'fleet', 'testimonial', 'banner', 'service', 'team_member', 'page' ), true ) ) {
+	if ( ! $screen || ! in_array( $screen->post_type, array( 'fleet', 'testimonial', 'banner', 'service', 'team_member', 'page', 'post' ), true ) ) {
 		return;
 	}
 
@@ -598,6 +612,6 @@ add_action( 'admin_enqueue_scripts', 'royal_limo_admin_assets' );
 
 require ROYAL_LIMO_DIR . '/inc/custom-post-types.php';
 require ROYAL_LIMO_DIR . '/inc/customizer.php';
-require ROYAL_LIMO_DIR . '/inc/cf7-integration.php';
+require ROYAL_LIMO_DIR . '/inc/forminator-integration.php';
 require ROYAL_LIMO_DIR . '/inc/quote-form.php';
 require ROYAL_LIMO_DIR . '/inc/infinite-scroll.php';

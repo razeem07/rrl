@@ -18,7 +18,7 @@ $fleet_header     = royal_limo_fleet_section();
 $fleet_categories = royal_limo_fleet_categories();
 ?>
 
-<section class="rl-page-header rl-reveal" <?php if ( $fleet_header['image_url'] ) : ?>style="background-image: url('<?php echo esc_url( $fleet_header['image_url'] ); ?>');"<?php endif; ?>>
+<section class="rl-page-header rl-reveal" <?php if ( $fleet_header['image_url'] ) : ?>style="background-image: linear-gradient(180deg, rgba(10, 10, 10, .55) 0%, rgba(10, 10, 10, .8) 100%), url('<?php echo esc_url( $fleet_header['image_url'] ); ?>');"<?php endif; ?>>
 	<div class="rl-page-header__inner">
 		<h1><?php echo esc_html( $fleet_header['heading'] ); ?></h1>
 		<nav class="rl-breadcrumb" aria-label="<?php esc_attr_e( 'Breadcrumb', 'royal-limo' ); ?>">
@@ -44,7 +44,7 @@ $fleet_categories = royal_limo_fleet_categories();
 
 		<?php if ( $fleet_categories ) : ?>
 			<div class="rl-filter-tabs rl-reveal">
-				<a href="<?php echo esc_url( home_url( '/fleet/' ) ); ?>" class="rl-filter-tabs__link is-active"><?php esc_html_e( 'All Vehicles', 'royal-limo' ); ?></a>
+				<a href="<?php echo esc_url( home_url( '/fleet/' ) ); ?>" class="rl-filter-tabs__link is-active"><?php esc_html_e( 'All Fleet', 'royal-limo' ); ?></a>
 				<?php foreach ( $fleet_categories as $term ) : ?>
 					<a href="<?php echo esc_url( get_term_link( $term ) ); ?>" class="rl-filter-tabs__link"><?php echo esc_html( $term->name ); ?></a>
 				<?php endforeach; ?>

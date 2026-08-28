@@ -15,7 +15,7 @@ get_header();
 $about_banner_image = get_post_meta( get_the_ID(), '_about_banner_image', true );
 ?>
 
-<section class="rl-page-header rl-reveal" <?php if ( $about_banner_image ) : ?>style="background-image: url('<?php echo esc_url( $about_banner_image ); ?>');"<?php endif; ?>>
+<section class="rl-page-header rl-reveal" <?php if ( $about_banner_image ) : ?>style="background-image: linear-gradient(180deg, rgba(10, 10, 10, .55) 0%, rgba(10, 10, 10, .8) 100%), url('<?php echo esc_url( $about_banner_image ); ?>');"<?php endif; ?>>
 	<div class="rl-page-header__inner">
 		<h1><?php the_title(); ?></h1>
 		<nav class="rl-breadcrumb" aria-label="<?php esc_attr_e( 'Breadcrumb', 'royal-limo' ); ?>">

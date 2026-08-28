@@ -45,7 +45,7 @@ while ( have_posts() ) :
 	$banner_image_url = has_post_thumbnail() ? get_the_post_thumbnail_url( $current_id, 'large' ) : '';
 	?>
 
-	<section class="rl-page-header rl-reveal" <?php if ( $banner_image_url ) : ?>style="background-image: url('<?php echo esc_url( $banner_image_url ); ?>');"<?php endif; ?>>
+	<section class="rl-page-header rl-reveal" <?php if ( $banner_image_url ) : ?>style="background-image: linear-gradient(180deg, rgba(10, 10, 10, .55) 0%, rgba(10, 10, 10, .8) 100%), url('<?php echo esc_url( $banner_image_url ); ?>');"<?php endif; ?>>
 		<div class="rl-page-header__inner">
 			<h1><?php the_title(); ?></h1>
 			<nav class="rl-breadcrumb" aria-label="<?php esc_attr_e( 'Breadcrumb', 'royal-limo' ); ?>">
@@ -94,6 +94,10 @@ while ( have_posts() ) :
 								</li>
 							<?php endif; ?>
 						</ul>
+
+						<?php if ( $specs ) : ?>
+							<p class="rl-single-fleet__specline rl-single-fleet__specline--sidebar"><?php echo esc_html( $specs ); ?></p>
+						<?php endif; ?>
 
 						<a href="<?php echo esc_url( royal_limo_booking_url() ); ?>" class="rl-btn rl-btn--neu rl-btn--gold" style="width:100%;">
 							<?php esc_html_e( 'Reserve This Vehicle', 'royal-limo' ); ?>
@@ -155,10 +159,6 @@ while ( have_posts() ) :
 					<div class="rl-page__content rl-reveal">
 						<?php the_content(); ?>
 					</div>
-
-					<?php if ( $specs ) : ?>
-						<p class="rl-single-fleet__specline rl-reveal"><?php echo esc_html( $specs ); ?></p>
-					<?php endif; ?>
 
 					<div class="rl-single-fleet__cta rl-reveal" style="text-align:left;">
 						<a href="<?php echo esc_url( royal_limo_booking_url() ); ?>" class="rl-btn rl-btn--neu rl-btn--gold">

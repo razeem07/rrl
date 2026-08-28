@@ -49,7 +49,7 @@ function royal_limo_register_fleet_cpt() {
 		// post type that declares this support, regardless of each
 		// field's own show_in_rest setting. Without it, the sidebar
 		// panel's meta reads/writes silently stop working.
-		'supports'     => array( 'title', 'editor', 'thumbnail', 'excerpt', 'custom-fields' ),
+		'supports'     => array( 'title', 'editor', 'thumbnail', 'excerpt', 'page-attributes', 'custom-fields' ),
 		'show_in_rest' => true,
 	) );
 }
@@ -861,3 +861,73 @@ function royal_limo_register_contact_page_meta() {
 }
 add_action( 'init', 'royal_limo_register_contact_page_meta' );
 add_filter( 'enter_title_here', 'royal_limo_faq_title_placeholder', 10, 2 );
+
+/* ==========================================================================
+   Blog post banner (single.php) — a dedicated field, deliberately
+   separate from the featured image (which also serves as the blog
+   listing card thumbnail and the "Recent Posts" sidebar thumbnail —
+   both far narrower/taller crops than a full-bleed page-header banner
+   needs, so one image can't serve both well).
+   ========================================================================== */
+
+function royal_limo_register_post_banner_meta() {
+	register_post_meta( 'post', '_post_banner_image', array(
+		'show_in_rest'      => true,
+		'single'            => true,
+		'type'              => 'string',
+		'sanitize_callback' => 'esc_url_raw',
+		'auth_callback'     => function () {
+			return current_user_can( 'edit_posts' );
+		},
+	) );
+}
+add_action( 'init', 'royal_limo_register_post_banner_meta' );
+
+/**
+ * Manual ordering for Fleet and Service admin list tables. Both post types
+ * support 'page-attributes', which already gives WordPress core's Quick
+ * Edit an "Order" field — this just surfaces that value as a sortable
+ * column and makes it the default sort, so the admin list matches what
+ * visitors see on the front end (both are queried by menu_order there).
+ */
+function royal_limo_add_order_column( $columns ) {
+	$new_columns = array();
+	foreach ( $columns as $key => $label ) {
+		$new_columns[ $key ] = $label;
+		if ( 'title' === $key ) {
+			$new_columns['rl_order'] = __( 'Order', 'royal-limo' );
+		}
+	}
+	return $new_columns;
+}
+add_filter( 'manage_fleet_posts_columns', 'royal_limo_add_order_column' );
+add_filter( 'manage_service_posts_columns', 'royal_limo_add_order_column' );
+
+function royal_limo_render_order_column( $column, $post_id ) {
+	if ( 'rl_order' === $column ) {
+		echo esc_html( get_post_field( 'menu_order', $post_id ) );
+	}
+}
+add_action( 'manage_fleet_posts_custom_column', 'royal_limo_render_order_column', 10, 2 );
+add_action( 'manage_service_posts_custom_column', 'royal_limo_render_order_column', 10, 2 );
+
+function royal_limo_order_column_sortable( $columns ) {
+	$columns['rl_order'] = 'menu_order';
+	return $columns;
+}
+add_filter( 'manage_edit-fleet_sortable_columns', 'royal_limo_order_column_sortable' );
+add_filter( 'manage_edit-service_sortable_columns', 'royal_limo_order_column_sortable' );
+
+function royal_limo_default_admin_order( $query ) {
+	if ( ! is_admin() || ! $query->is_main_query() ) {
+		return;
+	}
+	if ( ! in_array( $query->get( 'post_type' ), array( 'fleet', 'service' ), true ) ) {
+		return;
+	}
+	if ( ! $query->get( 'orderby' ) ) {
+		$query->set( 'orderby', 'menu_order title' );
+		$query->set( 'order', 'ASC' );
+	}
+}
+add_action( 'pre_get_posts', 'royal_limo_default_admin_order' );

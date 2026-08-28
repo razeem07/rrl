@@ -1,25 +1,81 @@
 <?php
 /**
- * Footer template.
+ * Footer template — four columns (Brand/Address, Contact Us, Quick
+ * Links, Info Links) plus a payment-icons row and a copyright bar.
  */
+
+$footer_phone         = get_theme_mod( 'royal_limo_phone', ROYAL_LIMO_DEFAULT_PHONE );
+$footer_whatsapp      = get_theme_mod( 'royal_limo_whatsapp_number', '' );
+$footer_email         = get_theme_mod( 'royal_limo_email', '' );
+$footer_address       = get_theme_mod( 'royal_limo_address', '' );
+$footer_hours         = get_theme_mod( 'royal_limo_operating_hours', ROYAL_LIMO_DEFAULT_OPERATING_HOURS );
+$footer_socials       = array(
+	'facebook'  => get_theme_mod( 'royal_limo_social_facebook', '' ),
+	'instagram' => get_theme_mod( 'royal_limo_social_instagram', '' ),
+	'linkedin'  => get_theme_mod( 'royal_limo_social_linkedin', '' ),
+);
+$footer_privacy_url   = get_privacy_policy_url();
+$footer_terms_page    = get_page_by_path( 'terms-conditions' );
+$footer_social_icons  = array(
+	'facebook'  => '<path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path>',
+	'instagram' => '<rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.5" y2="6.5"></line>',
+	'linkedin'  => '<path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect x="2" y="9" width="4" height="12"></rect><circle cx="4" cy="4" r="2"></circle>',
+);
+$footer_payment_icons = array(
+	'paypal'  => array( 'label' => 'PayPal', 'badge_text' => 'PayPal', 'image' => get_theme_mod( 'royal_limo_payment_icon_paypal', '' ) ),
+	'visa'    => array( 'label' => 'Visa', 'badge_text' => 'VISA', 'image' => get_theme_mod( 'royal_limo_payment_icon_visa', '' ) ),
+	'amex'    => array( 'label' => 'Amex', 'badge_text' => 'AMEX', 'image' => get_theme_mod( 'royal_limo_payment_icon_amex', '' ) ),
+	'maestro' => array( 'label' => 'Maestro', 'badge_text' => 'Maestro', 'image' => get_theme_mod( 'royal_limo_payment_icon_maestro', '' ) ),
+);
 ?>
 </main>
 
 <footer class="site-footer">
 	<div class="container site-footer__inner">
-		<div class="site-footer__col">
+		<div class="site-footer__col site-footer__col--brand">
 			<?php if ( has_custom_logo() ) : ?>
 				<?php the_custom_logo(); ?>
 			<?php else : ?>
 				<span class="site-title"><?php bloginfo( 'name' ); ?></span>
 			<?php endif; ?>
-			<p class="site-footer__tagline"><?php bloginfo( 'description' ); ?></p>
+
+			<?php if ( $footer_address ) : ?>
+				<h3 class="site-footer__heading"><?php esc_html_e( 'Address', 'royal-limo' ); ?></h3>
+				<p class="site-footer__address"><?php echo esc_html( $footer_address ); ?></p>
+			<?php endif; ?>
+
+			<?php if ( $footer_hours ) : ?>
+				<p class="site-footer__hours-label"><?php esc_html_e( 'Operating Hours - Office', 'royal-limo' ); ?></p>
+				<p class="site-footer__hours"><?php echo esc_html( $footer_hours ); ?></p>
+			<?php endif; ?>
+		</div>
+
+		<div class="site-footer__col">
+			<h3 class="site-footer__heading"><?php esc_html_e( 'Contact Us', 'royal-limo' ); ?></h3>
+			<ul class="site-footer__contact-list">
+				<?php if ( $footer_email ) : ?>
+					<li>
+						<span class="site-footer__contact-icon" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M2 7l10 6 10-6"/></svg></span>
+						<a href="mailto:<?php echo esc_attr( $footer_email ); ?>"><?php echo esc_html( $footer_email ); ?></a>
+					</li>
+				<?php endif; ?>
+				<li>
+					<span class="site-footer__contact-icon" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72c.127.96.362 1.903.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.338 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg></span>
+					<a href="<?php echo esc_attr( royal_limo_phone_href( $footer_phone ) ); ?>"><?php echo esc_html( $footer_phone ); ?></a>
+				</li>
+				<?php if ( $footer_whatsapp ) : ?>
+					<li>
+						<span class="site-footer__contact-icon" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72c.127.96.362 1.903.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.338 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg></span>
+						<a href="<?php echo esc_attr( royal_limo_phone_href( $footer_whatsapp ) ); ?>"><?php echo esc_html( $footer_whatsapp ); ?></a>
+					</li>
+				<?php endif; ?>
+			</ul>
+
 			<div class="site-footer__socials">
-				<?php foreach ( array( 'facebook', 'instagram', 'x' ) as $network ) :
-					$url = get_theme_mod( "royal_limo_social_{$network}", '' );
+				<?php foreach ( $footer_socials as $network => $url ) :
 					if ( $url ) : ?>
-						<a href="<?php echo esc_url( $url ); ?>" class="rl-icon-tile" target="_blank" rel="noopener noreferrer" aria-label="<?php echo esc_attr( ucfirst( $network ) ); ?>">
-							<?php echo esc_html( strtoupper( substr( $network, 0, 1 ) ) ); ?>
+						<a href="<?php echo esc_url( $url ); ?>" class="site-footer__social-icon" target="_blank" rel="noopener noreferrer" aria-label="<?php echo esc_attr( ucfirst( $network ) ); ?>">
+							<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><?php echo $footer_social_icons[ $network ]; ?></svg>
 						</a>
 					<?php endif;
 				endforeach; ?>
@@ -27,7 +83,7 @@
 		</div>
 
 		<div class="site-footer__col">
-			<h3 class="site-footer__heading"><?php esc_html_e( 'Explore', 'royal-limo' ); ?></h3>
+			<h3 class="site-footer__heading"><?php esc_html_e( 'Quick Links', 'royal-limo' ); ?></h3>
 			<?php
 			wp_nav_menu( array(
 				'theme_location' => 'footer',
@@ -39,10 +95,27 @@
 		</div>
 
 		<div class="site-footer__col">
-			<h3 class="site-footer__heading"><?php esc_html_e( 'Contact', 'royal-limo' ); ?></h3>
-			<p><a href="<?php echo esc_attr( royal_limo_phone_href( get_theme_mod( 'royal_limo_phone', ROYAL_LIMO_DEFAULT_PHONE ) ) ); ?>"><?php echo esc_html( get_theme_mod( 'royal_limo_phone', ROYAL_LIMO_DEFAULT_PHONE ) ); ?></a></p>
-			<p><a href="mailto:<?php echo esc_attr( get_theme_mod( 'royal_limo_email', '' ) ); ?>"><?php echo esc_html( get_theme_mod( 'royal_limo_email', '' ) ); ?></a></p>
-			<p><?php echo esc_html( get_theme_mod( 'royal_limo_address', '' ) ); ?></p>
+			<h3 class="site-footer__heading"><?php esc_html_e( 'Info Links', 'royal-limo' ); ?></h3>
+			<?php if ( $footer_privacy_url || $footer_terms_page ) : ?>
+				<ul class="site-footer__list">
+					<?php if ( $footer_privacy_url ) : ?>
+						<li><a href="<?php echo esc_url( $footer_privacy_url ); ?>"><?php esc_html_e( 'Privacy Policy', 'royal-limo' ); ?></a></li>
+					<?php endif; ?>
+					<?php if ( $footer_terms_page ) : ?>
+						<li><a href="<?php echo esc_url( get_permalink( $footer_terms_page ) ); ?>"><?php esc_html_e( 'Terms & Conditions', 'royal-limo' ); ?></a></li>
+					<?php endif; ?>
+				</ul>
+			<?php endif; ?>
+
+			<div class="site-footer__payments" aria-label="<?php esc_attr_e( 'Accepted payment methods', 'royal-limo' ); ?>">
+				<?php foreach ( $footer_payment_icons as $key => $data ) : ?>
+					<?php if ( $data['image'] ) : ?>
+						<img src="<?php echo esc_url( $data['image'] ); ?>" alt="<?php echo esc_attr( $data['label'] ); ?>" class="site-footer__payment-img" loading="lazy">
+					<?php else : ?>
+						<span class="site-footer__payment-badge site-footer__payment-badge--<?php echo esc_attr( $key ); ?>"><?php echo esc_html( $data['badge_text'] ); ?></span>
+					<?php endif; ?>
+				<?php endforeach; ?>
+			</div>
 		</div>
 	</div>
 

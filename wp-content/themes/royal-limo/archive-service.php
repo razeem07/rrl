@@ -13,7 +13,7 @@ get_header();
 $services_header = royal_limo_services_section();
 ?>
 
-<section class="rl-page-header rl-reveal" <?php if ( $services_header['image_url'] ) : ?>style="background-image: url('<?php echo esc_url( $services_header['image_url'] ); ?>');"<?php endif; ?>>
+<section class="rl-page-header rl-reveal" <?php if ( $services_header['image_url'] ) : ?>style="background-image: linear-gradient(180deg, rgba(10, 10, 10, .55) 0%, rgba(10, 10, 10, .8) 100%), url('<?php echo esc_url( $services_header['image_url'] ); ?>');"<?php endif; ?>>
 	<div class="rl-page-header__inner">
 		<h1><?php echo esc_html( $services_header['heading'] ); ?></h1>
 		<nav class="rl-breadcrumb" aria-label="<?php esc_attr_e( 'Breadcrumb', 'royal-limo' ); ?>">

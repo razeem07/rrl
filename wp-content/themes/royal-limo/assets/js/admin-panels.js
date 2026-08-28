@@ -495,6 +495,22 @@
 		);
 	}
 
+	/**
+	 * Blog posts — just the banner image (title/content/featured image
+	 * stay on the normal editor as usual).
+	 */
+	function PostBannerPanel() {
+		var metaState = useMeta();
+		var meta = metaState[0];
+		var setMetaField = metaState[1];
+
+		return el(
+			PluginDocumentSettingPanel,
+			{ name: 'royal-limo-post-banner', title: __( 'Blog Post Banner', 'royal-limo' ), icon: 'format-image' },
+			ImageField( meta, setMetaField, '_post_banner_image', __( 'Banner Image', 'royal-limo' ), __( 'Shown in the page-header banner at the top. Falls back to the featured image if left empty.', 'royal-limo' ) )
+		);
+	}
+
 	function RoyalLimoPanels() {
 		var postType = useSelect( function ( select ) {
 			var editor = select( 'core/editor' );
@@ -525,6 +541,9 @@
 		}
 		if ( 'page' === postType && 'page-contact.php' === template ) {
 			return el( ContactPageDetailsPanel );
+		}
+		if ( 'post' === postType ) {
+			return el( PostBannerPanel );
 		}
 		return null;
 	}

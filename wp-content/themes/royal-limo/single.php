@@ -18,10 +18,13 @@ while ( have_posts() ) :
 		'no_found_rows'  => true,
 	) );
 
-	$banner_image_url = has_post_thumbnail() ? get_the_post_thumbnail_url( get_the_ID(), 'large' ) : '';
+	$banner_image_url = get_post_meta( get_the_ID(), '_post_banner_image', true );
+	if ( ! $banner_image_url && has_post_thumbnail() ) {
+		$banner_image_url = get_the_post_thumbnail_url( get_the_ID(), 'large' );
+	}
 	?>
 
-	<section class="rl-page-header rl-page-header--blog rl-reveal" <?php if ( $banner_image_url ) : ?>style="background-image: url('<?php echo esc_url( $banner_image_url ); ?>');"<?php endif; ?>>
+	<section class="rl-page-header rl-page-header--blog rl-reveal" <?php if ( $banner_image_url ) : ?>style="background-image: linear-gradient(180deg, rgba(10, 10, 10, .55) 0%, rgba(10, 10, 10, .8) 100%), url('<?php echo esc_url( $banner_image_url ); ?>');"<?php endif; ?>>
 		<div class="rl-page-header__inner">
 			<h1><?php the_title(); ?></h1>
 			<nav class="rl-breadcrumb" aria-label="<?php esc_attr_e( 'Breadcrumb', 'royal-limo' ); ?>">

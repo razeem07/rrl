@@ -15,11 +15,15 @@ get_header();
 $phone   = get_theme_mod( 'royal_limo_phone', ROYAL_LIMO_DEFAULT_PHONE );
 $email   = get_theme_mod( 'royal_limo_email', '' );
 $address = get_theme_mod( 'royal_limo_address', '' );
+$map_embed_url = get_theme_mod( 'royal_limo_map_embed_url', '' );
+if ( ! $map_embed_url && $address ) {
+	$map_embed_url = 'https://www.google.com/maps?q=' . rawurlencode( $address ) . '&output=embed';
+}
 
 $contact_banner_image = get_post_meta( get_the_ID(), '_contact_banner_image', true );
 ?>
 
-<section class="rl-page-header rl-reveal" <?php if ( $contact_banner_image ) : ?>style="background-image: url('<?php echo esc_url( $contact_banner_image ); ?>');"<?php endif; ?>>
+<section class="rl-page-header rl-reveal" <?php if ( $contact_banner_image ) : ?>style="background-image: linear-gradient(180deg, rgba(10, 10, 10, .55) 0%, rgba(10, 10, 10, .8) 100%), url('<?php echo esc_url( $contact_banner_image ); ?>');"<?php endif; ?>>
 	<div class="rl-page-header__inner">
 		<h1><?php the_title(); ?></h1>
 		<nav class="rl-breadcrumb" aria-label="<?php esc_attr_e( 'Breadcrumb', 'royal-limo' ); ?>">
@@ -88,12 +92,12 @@ $contact_banner_image = get_post_meta( get_the_ID(), '_contact_banner_image', tr
 
 <?php get_template_part( 'template-parts/service-areas' ); ?>
 
-<?php if ( $address ) : ?>
+<?php if ( $map_embed_url ) : ?>
 	<section class="rl-section rl-contact__map" style="padding-top: 0;">
 		<div class="container">
 			<div class="glass-panel" style="overflow:hidden;">
 				<iframe
-					src="https://www.google.com/maps?q=<?php echo rawurlencode( $address ); ?>&output=embed"
+					src="<?php echo esc_url( $map_embed_url ); ?>"
 					width="100%" height="380" style="border:0; display:block;"
 					loading="lazy" referrerpolicy="no-referrer-when-downgrade"
 					title="<?php esc_attr_e( 'Location map', 'royal-limo' ); ?>">
