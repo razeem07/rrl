@@ -1327,21 +1327,23 @@ a.rl-card:hover {
 	flex: 0 0 auto;
 	display: flex;
 	align-items: center;
-	height: 28px;
+	height: 52px;
 }
 
 .rl-brand-marquee__logo img {
 	height: 100%;
 	width: auto;
 	object-fit: contain;
-	filter: grayscale(1) brightness(1.6);
-	opacity: 0.7;
-	transition: filter var(--transition-fast), opacity var(--transition-fast);
+	border-radius: var(--radius-sm);
+	/* Logos are plain photos/JPGs (opaque backgrounds, not transparent
+	   PNGs on brand color), so a grayscale+brighten "monochrome until
+	   hover" treatment washed a white-background logo out to near
+	   invisibility instead of dimming it tastefully. Show them as-is. */
+	transition: transform var(--transition-fast);
 }
 
 .rl-brand-marquee__logo:hover img {
-	filter: none;
-	opacity: 1;
+	transform: scale(1.06);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -1375,6 +1377,10 @@ a.rl-card:hover {
 	.rl-video-card__play {
 		width: 56px;
 		height: 56px;
+	}
+
+	.rl-brand-marquee__logo {
+		height: 40px;
 	}
 }
 
@@ -2565,6 +2571,14 @@ a.rl-reviews-badge:hover .rl-reviews-badge__count {
 	.rl-service-detail__checklist {
 		grid-template-columns: 1fr;
 	}
+
+	/* This pill spans the full sidebar width, which on a single-column
+	   mobile layout reaches the same bottom-right corner the fixed
+	   WhatsApp button occupies — clear space for it instead of letting
+	   the button sit on top of the phone number's tap target. */
+	.rl-service-sidebar__phone {
+		margin-right: 64px;
+	}
 }
 
 /* ---- Fleet detail page (single-fleet.php) ---- */
@@ -3160,6 +3174,14 @@ a.rl-reviews-badge:hover .rl-reviews-badge__count {
 		right: var(--space-sm);
 		bottom: var(--space-sm);
 	}
+
+	/* The floating button is fixed to the viewport corner, so once a
+	   visitor scrolls to the true bottom of the page it sits right on
+	   top of the centered copyright line. Reserve clear space below it
+	   instead of overlapping the text. */
+	.site-footer__bottom {
+		padding-bottom: calc(52px + var(--space-md));
+	}
 }
 
 .rl-infinite-loader__spinner {
@@ -3223,17 +3245,25 @@ a.rl-reviews-badge:hover .rl-reviews-badge__count {
 		right: 0;
 		flex-direction: column;
 		align-items: stretch;
-		background: rgba(8, 8, 8, 0.96);
-		backdrop-filter: blur(var(--glass-blur));
-		padding: var(--space-md);
+		/* Fully solid, not translucent — this covers the page content
+		   behind it, and rgba()+backdrop-filter left a faint ghost of
+		   the hero text showing through on some renderers. */
+		background: var(--bg-black);
+		/* Vertical padding only applies once open (see .is-open below) —
+		   max-height:0 clips the flex content just fine, but a flex
+		   container's own padding isn't reduced by that clamping, so a
+		   collapsed menu with padding still renders as a visible sliver
+		   showing its first item peeking out below the header. */
+		padding: 0 var(--space-md);
 		gap: var(--space-md);
 		max-height: 0;
 		overflow-y: auto;
-		transition: max-height var(--transition-med);
+		transition: max-height var(--transition-med), padding var(--transition-med);
 	}
 
 	.primary-nav.is-open {
 		max-height: 80vh;
+		padding: var(--space-md);
 	}
 
 	.primary-nav__list {

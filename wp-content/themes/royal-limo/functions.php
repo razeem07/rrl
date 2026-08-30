@@ -137,18 +137,18 @@ function royal_limo_service_areas() {
  * royal_limo_hero_stats() above for why).
  */
 function royal_limo_about_section() {
-	$default_description = "Royal Luxury Limousine is a premium chauffeured car service in Los Angeles, offering polished vehicles and professional drivers for customers who expect comfort, discretion, and a smooth ride from pickup to drop-off.\n\nFrom airport transfers to weddings and executive travel, every booking is handled by chauffeurs who know the city and treat every trip like it matters — because to you, it does.\n\nWith fast booking support, a meticulously maintained fleet, and fifteen years of trust behind it, Royal Luxury Limousine has built a reputation that matches Los Angeles' standard for style.";
+	$default_description = "Royal Luxury Limousine is a premium chauffeured car service in the UAE, offering polished vehicles and professional drivers for customers who expect comfort, discretion, and a smooth ride from pickup to drop-off.\n\nFrom airport transfers to weddings and executive travel, every booking is handled by chauffeurs who know the city and treat every trip like it matters — because to you, it does.\n\nWith fast booking support, a meticulously maintained fleet, and years of trust behind it, Royal Luxury Limousine has built a reputation that matches the UAE's standard for style.";
 
 	return array(
 		'eyebrow'        => get_theme_mod( 'royal_limo_about_eyebrow', 'About Royal Luxury Limousine' ),
-		'heading'        => get_theme_mod( 'royal_limo_about_heading', 'Experience Chauffeured Luxury in Los Angeles with Confidence and Style' ),
+		'heading'        => get_theme_mod( 'royal_limo_about_heading', 'Experience Chauffeured Luxury in the UAE with Confidence and Style' ),
 		'description'    => get_theme_mod( 'royal_limo_about_description', $default_description ),
 		// The image control's setting already holds the attachment URL
 		// (see the sanitize_callback note in inc/customizer.php) — use
 		// it as-is, no wp_get_attachment_image_url() lookup needed.
 		'image_url'      => get_theme_mod( 'royal_limo_about_image', '' ),
 		'bar_heading'    => get_theme_mod( 'royal_limo_about_bar_heading', 'Why Book With Us?' ),
-		'bar_text'       => get_theme_mod( 'royal_limo_about_bar_text', 'Top-Rated Chauffeur Service in Los Angeles' ),
+		'bar_text'       => get_theme_mod( 'royal_limo_about_bar_text', 'Top-Rated Chauffeur Service in the UAE' ),
 		'reviews_rating' => get_theme_mod( 'royal_limo_about_reviews_rating', '4.9' ),
 		'reviews_count'  => get_theme_mod( 'royal_limo_about_reviews_count', '500+' ),
 		'reviews_url'    => get_theme_mod( 'royal_limo_about_reviews_url', '' ),
@@ -166,7 +166,7 @@ function royal_limo_why_choose_us() {
 		1 => array( 'heading' => 'Exclusive Fleet', 'description' => 'Hand-picked luxury sedans, SUVs, and limousines for every occasion.' ),
 		2 => array( 'heading' => 'Licensed & Insured', 'description' => 'Every vehicle and chauffeur meets rigorous safety and licensing standards.' ),
 		3 => array( 'heading' => 'Client First', 'description' => 'Your comfort, privacy, and satisfaction are always our top priority.' ),
-		4 => array( 'heading' => 'Citywide Service', 'description' => 'Reliable pickup and drop-off availability across Los Angeles and beyond.' ),
+		4 => array( 'heading' => 'Citywide Service', 'description' => 'Reliable pickup and drop-off availability across Dubai, Abu Dhabi, and beyond.' ),
 	);
 
 	$reasons = array();
@@ -201,7 +201,7 @@ function royal_limo_why_choose_us() {
  * image, and the trust bar (heading/tagline/Google rating).
  */
 function royal_limo_about_page_intro( $post_id ) {
-	$default_description = "Royal Luxury Limousine is a premium chauffeured car service in UAE, offering polished vehicles and professional drivers for customers who expect comfort, discretion, and a smooth ride from pickup to drop-off.\n\nFrom airport transfers to weddings and executive travel, every booking is handled by chauffeurs who know the city and treat every trip like it matters — because to you, it does.\n\nWith fast booking support, a meticulously maintained fleet, and fifteen years of trust behind it, Royal Luxury Limousine has built a reputation that matches Los Angeles' standard for style.";
+	$default_description = "Royal Luxury Limousine is a premium chauffeured car service in UAE, offering polished vehicles and professional drivers for customers who expect comfort, discretion, and a smooth ride from pickup to drop-off.\n\nFrom airport transfers to weddings and executive travel, every booking is handled by chauffeurs who know the city and treat every trip like it matters — because to you, it does.\n\nWith fast booking support, a meticulously maintained fleet, and years of trust behind it, Royal Luxury Limousine has built a reputation that matches the UAE's standard for style.";
 
 	$get = function ( $key, $default ) use ( $post_id ) {
 		$value = get_post_meta( $post_id, $key, true );
@@ -231,7 +231,7 @@ function royal_limo_about_page_why_us( $post_id ) {
 		1 => array( 'heading' => 'Exclusive Fleet', 'description' => 'Hand-picked luxury sedans, SUVs, and limousines for every occasion.' ),
 		2 => array( 'heading' => 'Licensed & Insured', 'description' => 'Every vehicle and chauffeur meets rigorous safety and licensing standards.' ),
 		3 => array( 'heading' => 'Client First', 'description' => 'Your comfort, privacy, and satisfaction are always our top priority.' ),
-		4 => array( 'heading' => 'Citywide Service', 'description' => 'Reliable pickup and drop-off availability across Los Angeles and beyond.' ),
+		4 => array( 'heading' => 'Citywide Service', 'description' => 'Reliable pickup and drop-off availability across Dubai, Abu Dhabi, and beyond.' ),
 	);
 
 	$get = function ( $key, $default ) use ( $post_id ) {
@@ -277,7 +277,7 @@ function royal_limo_our_approach( $post_id ) {
 		),
 		'vision_heading'  => $get( '_approach_vision_heading', 'Our Vision' ),
 		'vision_points'   => array(
-			$get( '_approach_vision_point1', 'Set the standard for luxury chauffeured travel in Los Angeles' ),
+			$get( '_approach_vision_point1', 'Set the standard for luxury chauffeured travel in the UAE' ),
 			$get( '_approach_vision_point2', 'Build lasting trust with every client, one journey at a time' ),
 		),
 	);
@@ -615,3 +615,4 @@ require ROYAL_LIMO_DIR . '/inc/customizer.php';
 require ROYAL_LIMO_DIR . '/inc/forminator-integration.php';
 require ROYAL_LIMO_DIR . '/inc/quote-form.php';
 require ROYAL_LIMO_DIR . '/inc/infinite-scroll.php';
+require ROYAL_LIMO_DIR . '/inc/staging-noindex.php';

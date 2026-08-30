@@ -276,7 +276,7 @@ function royal_limo_customize_register( $wp_customize ) {
 	) );
 
 	$wp_customize->add_setting( 'royal_limo_about_heading', array(
-		'default'           => 'Experience Chauffeured Luxury in Los Angeles with Confidence and Style',
+		'default'           => 'Experience Chauffeured Luxury in the UAE with Confidence and Style',
 		'sanitize_callback' => 'sanitize_text_field',
 	) );
 	$wp_customize->add_control( 'royal_limo_about_heading', array(
@@ -286,7 +286,7 @@ function royal_limo_customize_register( $wp_customize ) {
 	) );
 
 	$wp_customize->add_setting( 'royal_limo_about_description', array(
-		'default'           => "Royal Luxury Limousine is a premium chauffeured car service in Los Angeles, offering polished vehicles and professional drivers for customers who expect comfort, discretion, and a smooth ride from pickup to drop-off.\n\nFrom airport transfers to weddings and executive travel, every booking is handled by chauffeurs who know the city and treat every trip like it matters — because to you, it does.\n\nWith fast booking support, a meticulously maintained fleet, and fifteen years of trust behind it, Royal Luxury Limousine has built a reputation that matches Los Angeles' standard for style.",
+		'default'           => "Royal Luxury Limousine is a premium chauffeured car service in the UAE, offering polished vehicles and professional drivers for customers who expect comfort, discretion, and a smooth ride from pickup to drop-off.\n\nFrom airport transfers to weddings and executive travel, every booking is handled by chauffeurs who know the city and treat every trip like it matters — because to you, it does.\n\nWith fast booking support, a meticulously maintained fleet, and years of trust behind it, Royal Luxury Limousine has built a reputation that matches the UAE's standard for style.",
 		'sanitize_callback' => 'sanitize_textarea_field',
 	) );
 	$wp_customize->add_control( 'royal_limo_about_description', array(
@@ -319,7 +319,7 @@ function royal_limo_customize_register( $wp_customize ) {
 	) );
 
 	$wp_customize->add_setting( 'royal_limo_about_bar_text', array(
-		'default'           => 'Top-Rated Chauffeur Service in Los Angeles',
+		'default'           => 'Top-Rated Chauffeur Service in the UAE',
 		'sanitize_callback' => 'sanitize_text_field',
 	) );
 	$wp_customize->add_control( 'royal_limo_about_bar_text', array(
@@ -414,7 +414,7 @@ function royal_limo_customize_register( $wp_customize ) {
 		),
 		4 => array(
 			'heading'     => 'Citywide Service',
-			'description' => 'Reliable pickup and drop-off availability across Los Angeles and beyond.',
+			'description' => 'Reliable pickup and drop-off availability across Dubai, Abu Dhabi, and beyond.',
 		),
 	);
 	foreach ( $why_us_defaults as $i => $defaults ) {
