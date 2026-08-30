@@ -14,6 +14,12 @@ wp-content/cache/
 wp-content/plugins/akismet/
 wp-content/plugins/hello.php
 
+# Uploaded media belongs to whichever database it was uploaded into (local
+# or live), not to source control — tracking it here is what caused local
+# and live content to drift apart. Move real uploads via SFTP/rsync once
+# instead.
+wp-content/uploads/
+
 # OS/editor cruft
 .DS_Store
 Thumbs.db
