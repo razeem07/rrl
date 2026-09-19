@@ -541,6 +541,31 @@ function royal_limo_asset_version( $relative_path ) {
 }
 
 /**
+ * Site color scheme: 'dark' (default, all-black) or 'alt' (black with
+ * alternating off-white sections). Chosen in the Customizer; a logged-in
+ * admin can also preview either one for a single request with
+ * ?scheme=alt / ?scheme=dark without changing the saved setting.
+ */
+function royal_limo_sanitize_color_scheme( $value ) {
+	return in_array( $value, array( 'dark', 'alt' ), true ) ? $value : 'dark';
+}
+
+function royal_limo_color_scheme() {
+	if ( isset( $_GET['scheme'] ) && current_user_can( 'edit_theme_options' ) ) {
+		return royal_limo_sanitize_color_scheme( sanitize_key( wp_unslash( $_GET['scheme'] ) ) );
+	}
+	return royal_limo_sanitize_color_scheme( get_theme_mod( 'royal_limo_color_scheme', 'dark' ) );
+}
+
+function royal_limo_scheme_body_class( $classes ) {
+	if ( 'alt' === royal_limo_color_scheme() ) {
+		$classes[] = 'rl-scheme-alt';
+	}
+	return $classes;
+}
+add_filter( 'body_class', 'royal_limo_scheme_body_class' );
+
+/**
  * Enqueue styles/scripts. Plain files, no build step, loaded in dependency order.
  */
 function royal_limo_assets() {
@@ -553,6 +578,12 @@ function royal_limo_assets() {
 	wp_enqueue_style( 'royal-limo-layout', $css_dir . 'layout.css', array( 'royal-limo-base' ), royal_limo_asset_version( '/assets/css/layout.css' ) );
 	wp_enqueue_style( 'royal-limo-animations-css', $css_dir . 'animations.css', array( 'royal-limo-layout' ), royal_limo_asset_version( '/assets/css/animations.css' ) );
 	wp_enqueue_style( 'royal-limo-style', get_stylesheet_uri(), array( 'royal-limo-animations-css' ), royal_limo_asset_version( '/style.css' ) );
+
+	// Only loaded for the alternate scheme, so the default black site
+	// ships exactly the same CSS it always did.
+	if ( 'alt' === royal_limo_color_scheme() ) {
+		wp_enqueue_style( 'royal-limo-scheme-alt', $css_dir . 'scheme-alt.css', array( 'royal-limo-style' ), royal_limo_asset_version( '/assets/css/scheme-alt.css' ) );
+	}
 
 	// GSAP from CDN (jsdelivr), core + ScrollTrigger only.
 	wp_enqueue_script( 'gsap', 'https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js', array(), '3.12.5', true );

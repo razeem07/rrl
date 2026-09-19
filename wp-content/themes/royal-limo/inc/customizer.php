@@ -9,6 +9,26 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 function royal_limo_customize_register( $wp_customize ) {
 
+	$wp_customize->add_section( 'royal_limo_scheme', array(
+		'title'       => __( 'Color Scheme', 'royal-limo' ),
+		'description' => __( 'Switch the whole site between two looks. Header, hero, footer and photo sections stay black in both.', 'royal-limo' ),
+		'priority'    => 24,
+	) );
+
+	$wp_customize->add_setting( 'royal_limo_color_scheme', array(
+		'default'           => 'dark',
+		'sanitize_callback' => 'royal_limo_sanitize_color_scheme',
+	) );
+	$wp_customize->add_control( 'royal_limo_color_scheme', array(
+		'label'   => __( 'Site look', 'royal-limo' ),
+		'section' => 'royal_limo_scheme',
+		'type'    => 'radio',
+		'choices' => array(
+			'dark' => __( 'Black — every section dark', 'royal-limo' ),
+			'alt'  => __( 'Black & Off-White — alternating sections', 'royal-limo' ),
+		),
+	) );
+
 	$wp_customize->add_section( 'royal_limo_contact', array(
 		'title'    => __( 'Contact Info', 'royal-limo' ),
 		'priority' => 30,

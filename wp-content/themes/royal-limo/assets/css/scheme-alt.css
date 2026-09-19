@@ -1,0 +1,58 @@
+/* ==========================================================================
+   Alternate color scheme: black + off-white alternating sections.
+   Only loaded when Customizer > Color Scheme is set to "Black & Off-White"
+   (or an admin previews it with ?scheme=alt).
+
+   Approach: the whole design is driven by custom properties (see
+   base.css), so instead of restyling components, every second content
+   section re-declares those properties with light values and all of its
+   children follow. --bg-black is deliberately NOT flipped: several rules
+   use it as the dark "ink" printed on gold buttons and icon chips.
+
+   Which sections go light: the direct children of <main> that are
+   .rl-section, counted by position, even ones only. The hero / page header
+   is always child 1, so the first content section after it is light and
+   the rest alternate, on every template, whichever sections are present.
+   Photo-backed sections stay dark (see the exclusions).
+   ========================================================================== */
+
+/* ---- Light sections ---- */
+body.rl-scheme-alt main > .rl-section:nth-child(even):not(.rl-video-showcase, .rl-booking-cta-section, .rl-contact__map) {
+	--text-light: #17171a;
+	--text-muted: #5a5853;
+	--surface: #ffffff;
+	--bg-black-soft: #ebe8e1;
+
+	/* Text-safe brass for the light ground; the gradient with the softer
+	   stop keeps gold buttons looking like brushed brass, not mud. */
+	--gold: #8c6b1c;
+	--gold-soft: #cfa94f;
+
+	--glass-bg: rgba(23, 23, 26, 0.04);
+	--glass-bg-strong: rgba(23, 23, 26, 0.07);
+	--glass-border: rgba(23, 23, 26, 0.13);
+
+	--neu-light: rgba(255, 255, 255, 0.95);
+	--neu-dark: rgba(23, 23, 26, 0.14);
+
+	background-color: #f5f4f1;
+	color: var(--text-light);
+}
+
+/* ---- Components that sit on a photo keep the dark tokens, even inside a
+   light section (white text on a dark gradient over an image). ---- */
+body.rl-scheme-alt .rl-service-card,
+body.rl-scheme-alt .rl-team-card__socials {
+	--text-light: #f5f4f2;
+	--text-muted: #a8a6a2;
+	--surface: #16161a;
+	--bg-black-soft: #121212;
+	--gold: #c9a24b;
+	--gold-soft: #e8c97a;
+	--glass-bg: rgba(255, 255, 255, 0.06);
+	--glass-bg-strong: rgba(255, 255, 255, 0.1);
+	--glass-border: rgba(255, 255, 255, 0.14);
+	--neu-light: rgba(255, 255, 255, 0.05);
+	--neu-dark: rgba(0, 0, 0, 0.6);
+	color: var(--text-light);
+}
