@@ -47,6 +47,11 @@
 	max-width: 100%;
 }
 
+.rl-logo--custom .custom-logo-link {
+	flex: 0 0 auto;
+	display: flex;
+}
+
 .rl-logo__badge {
 	display: inline-flex;
 	align-items: center;

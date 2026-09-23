@@ -22,7 +22,7 @@
 	<div class="container site-header__inner">
 		<div class="site-branding">
 			<?php if ( has_custom_logo() ) : ?>
-				<?php the_custom_logo(); ?>
+				<div class="rl-logo rl-logo--custom"><?php the_custom_logo(); ?><a href="<?php echo esc_url( home_url( '/' ) ); ?>" class="rl-logo__word"><?php bloginfo( 'name' ); ?></a></div>
 			<?php else : ?>
 				<a href="<?php echo esc_url( home_url( '/' ) ); ?>" class="rl-logo">
 					<span class="rl-logo__badge" aria-hidden="true">
