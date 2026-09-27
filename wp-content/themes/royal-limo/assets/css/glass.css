@@ -28,14 +28,32 @@
 	}
 }
 
+/* Floats transparently over the hero/page-header banner every template
+   starts with — position:absolute takes it out of normal flow so that
+   section renders starting at the very top of the page, underneath the
+   header, instead of below it (which is all a transparent background
+   alone would achieve — sticky/static positioning still reserves the
+   header's own space first). Once scrolled past that banner, JS adds
+   .is-scrolled, which re-pins it with position:fixed and a solid
+   blurred background so it stays readable over plain content below. */
 .site-header {
-	position: sticky;
+	position: absolute;
 	top: 0;
+	left: 0;
+	right: 0;
 	z-index: 100;
-	transition: background var(--transition-med), box-shadow var(--transition-med);
+	background: transparent;
+	border: none;
+	box-shadow: none;
+	backdrop-filter: none;
+	-webkit-backdrop-filter: none;
+	transition: background var(--transition-med), box-shadow var(--transition-med), backdrop-filter var(--transition-med);
 }
 
 .site-header.is-scrolled {
+	position: fixed;
 	background: rgba(8, 8, 8, 0.8);
+	backdrop-filter: blur(var(--glass-blur));
+	-webkit-backdrop-filter: blur(var(--glass-blur));
 	box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
 }

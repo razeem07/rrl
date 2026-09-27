@@ -250,7 +250,7 @@ function royal_limo_customize_register( $wp_customize ) {
 	) );
 
 	$wp_customize->add_setting( 'royal_limo_service_areas_description', array(
-		'default'           => 'Enjoy complimentary pickup and drop-off across Dubai and the wider UAE — including Dubai International Airport, Downtown Dubai, Dubai Marina, Palm Jumeirah, and Abu Dhabi. Additional areas available by request.',
+		'default'           => 'Enjoy complimentary pickup and drop-off across all seven emirates of the UAE.',
 		'sanitize_callback' => 'sanitize_textarea_field',
 	) );
 	$wp_customize->add_control( 'royal_limo_service_areas_description', array(
@@ -260,11 +260,13 @@ function royal_limo_customize_register( $wp_customize ) {
 	) );
 
 	$service_area_defaults = array(
-		1 => 'Dubai Airport',
-		2 => 'Downtown Dubai',
-		3 => 'Dubai Marina',
-		4 => 'Palm Jumeirah',
-		5 => 'Abu Dhabi',
+		1 => 'Abu Dhabi',
+		2 => 'Dubai',
+		3 => 'Sharjah',
+		4 => 'Ajman',
+		5 => 'Umm Al Quwain',
+		6 => 'Ras Al Khaimah',
+		7 => 'Fujairah',
 	);
 	foreach ( $service_area_defaults as $i => $default_label ) {
 		$wp_customize->add_setting( "royal_limo_service_area_{$i}", array(

@@ -100,18 +100,20 @@ function royal_limo_hero_stats() {
 
 /**
  * The "Where We Serve" section content: eyebrow/heading/description plus
- * the 5 route stops. Fallback defaults here must match the 'default'
+ * the route stops (one per emirate). Fallback defaults here must match the 'default'
  * values registered in inc/customizer.php (see royal_limo_hero_stats()
  * above for why — get_theme_mod()'s fallback is independent of the
  * Customizer control's own default).
  */
 function royal_limo_service_areas() {
 	$location_defaults = array(
-		1 => 'Dubai Airport',
-		2 => 'Downtown Dubai',
-		3 => 'Dubai Marina',
-		4 => 'Palm Jumeirah',
-		5 => 'Abu Dhabi',
+		1 => 'Abu Dhabi',
+		2 => 'Dubai',
+		3 => 'Sharjah',
+		4 => 'Ajman',
+		5 => 'Umm Al Quwain',
+		6 => 'Ras Al Khaimah',
+		7 => 'Fujairah',
 	);
 
 	$locations = array();
@@ -125,7 +127,7 @@ function royal_limo_service_areas() {
 	return array(
 		'eyebrow'     => get_theme_mod( 'royal_limo_service_areas_eyebrow', 'Where We Serve' ),
 		'heading'     => get_theme_mod( 'royal_limo_service_areas_heading', 'Serving You Across the UAE' ),
-		'description' => get_theme_mod( 'royal_limo_service_areas_description', 'Enjoy complimentary pickup and drop-off across Dubai and the wider UAE — including Dubai International Airport, Downtown Dubai, Dubai Marina, Palm Jumeirah, and Abu Dhabi. Additional areas available by request.' ),
+		'description' => get_theme_mod( 'royal_limo_service_areas_description', 'Enjoy complimentary pickup and drop-off across all seven emirates of the UAE.' ),
 		'locations'   => $locations,
 	);
 }

@@ -562,7 +562,11 @@
 	font-size: 0.85rem;
 	font-weight: 600;
 	color: var(--text-light);
-	white-space: nowrap;
+	/* Seven stops share the row now, so a long name like "Ras Al Khaimah"
+	   must be allowed to wrap on mid-size screens instead of overflowing. */
+	white-space: normal;
+	text-wrap: balance;
+	padding-inline: 0.25rem;
 }
 
 @media (max-width: 768px) {

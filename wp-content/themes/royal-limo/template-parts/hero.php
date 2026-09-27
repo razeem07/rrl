@@ -53,7 +53,7 @@ $hero_stats = royal_limo_hero_stats();
 <section class="rl-hero-carousel" id="hero" data-rl-hero-carousel>
 	<div class="rl-hero-track">
 		<?php foreach ( $slides as $i => $slide ) : ?>
-			<div class="rl-hero-slide" <?php if ( $slide['image_url'] ) : ?>style="background-image: linear-gradient(180deg, rgba(10,10,10,.55), rgba(10,10,10,.85)), url('<?php echo esc_url( $slide['image_url'] ); ?>');"<?php endif; ?>>
+			<div class="rl-hero-slide" <?php if ( $slide['image_url'] ) : ?>style="background-image: linear-gradient(180deg, rgba(10,10,10,.4), rgba(10,10,10,.65)), url('<?php echo esc_url( $slide['image_url'] ); ?>');"<?php endif; ?>>
 				<div class="container rl-hero-slide__inner">
 					<div class="rl-hero-slide__copy">
 						<span class="rl-pill-badge">
