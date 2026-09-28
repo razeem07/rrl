@@ -280,6 +280,80 @@ function royal_limo_customize_register( $wp_customize ) {
 		) );
 	}
 
+	// "Our Ventures" section — a fixed pair of sibling-brand cards shown
+	// right after Service Areas on the homepage. Each card only renders
+	// once its logo image AND name are both set (see royal_limo_ventures()
+	// in functions.php), so leaving a slot blank simply hides that card
+	// instead of showing an empty box.
+	$wp_customize->add_section( 'royal_limo_ventures', array(
+		'title'    => __( 'Our Ventures', 'royal-limo' ),
+		'priority' => 26,
+	) );
+
+	$wp_customize->add_setting( 'royal_limo_ventures_eyebrow', array(
+		'default'           => 'Part of the Family',
+		'sanitize_callback' => 'sanitize_text_field',
+	) );
+	$wp_customize->add_control( 'royal_limo_ventures_eyebrow', array(
+		'label'   => __( 'Eyebrow Text', 'royal-limo' ),
+		'section' => 'royal_limo_ventures',
+		'type'    => 'text',
+	) );
+
+	$wp_customize->add_setting( 'royal_limo_ventures_heading', array(
+		'default'           => 'Our Ventures',
+		'sanitize_callback' => 'sanitize_text_field',
+	) );
+	$wp_customize->add_control( 'royal_limo_ventures_heading', array(
+		'label'   => __( 'Heading', 'royal-limo' ),
+		'section' => 'royal_limo_ventures',
+		'type'    => 'text',
+	) );
+
+	for ( $i = 1; $i <= 2; $i++ ) {
+		$wp_customize->add_setting( "royal_limo_venture{$i}_logo", array(
+			'default'           => '',
+			// See the note on royal_limo_video_image above — this control
+			// stores a URL, not an attachment ID.
+			'sanitize_callback' => 'esc_url_raw',
+		) );
+		$wp_customize->add_control( new WP_Customize_Image_Control( $wp_customize, "royal_limo_venture{$i}_logo", array(
+			'label'   => sprintf( __( 'Venture %d — Logo', 'royal-limo' ), $i ),
+			'section' => 'royal_limo_ventures',
+		) ) );
+
+		$wp_customize->add_setting( "royal_limo_venture{$i}_name", array(
+			'default'           => '',
+			'sanitize_callback' => 'sanitize_text_field',
+		) );
+		$wp_customize->add_control( "royal_limo_venture{$i}_name", array(
+			'label'       => sprintf( __( 'Venture %d — Name', 'royal-limo' ), $i ),
+			'description' => 1 === $i ? __( 'A venture card only appears once its logo and name are both set.', 'royal-limo' ) : '',
+			'section'     => 'royal_limo_ventures',
+			'type'        => 'text',
+		) );
+
+		$wp_customize->add_setting( "royal_limo_venture{$i}_tagline", array(
+			'default'           => '',
+			'sanitize_callback' => 'sanitize_text_field',
+		) );
+		$wp_customize->add_control( "royal_limo_venture{$i}_tagline", array(
+			'label'   => sprintf( __( 'Venture %d — Tagline (optional)', 'royal-limo' ), $i ),
+			'section' => 'royal_limo_ventures',
+			'type'    => 'text',
+		) );
+
+		$wp_customize->add_setting( "royal_limo_venture{$i}_url", array(
+			'default'           => '',
+			'sanitize_callback' => 'esc_url_raw',
+		) );
+		$wp_customize->add_control( "royal_limo_venture{$i}_url", array(
+			'label'   => sprintf( __( 'Venture %d — Link (optional)', 'royal-limo' ), $i ),
+			'section' => 'royal_limo_ventures',
+			'type'    => 'url',
+		) );
+	}
+
 	// About section — eyebrow/heading/description, a brand-mark showcase
 	// card, and a bottom trust bar with a Google-reviews badge.
 	$wp_customize->add_section( 'royal_limo_about', array(

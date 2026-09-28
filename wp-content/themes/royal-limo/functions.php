@@ -133,6 +133,34 @@ function royal_limo_service_areas() {
 }
 
 /**
+ * "Our Ventures" section: eyebrow/heading plus up to 2 sibling-brand
+ * cards. A venture only appears once its logo AND name are both set —
+ * no placeholder text/logo is invented for an empty slot.
+ */
+function royal_limo_ventures() {
+	$ventures = array();
+	for ( $i = 1; $i <= 2; $i++ ) {
+		$logo = get_theme_mod( "royal_limo_venture{$i}_logo", '' );
+		$name = get_theme_mod( "royal_limo_venture{$i}_name", '' );
+		if ( '' === $logo || '' === $name ) {
+			continue;
+		}
+		$ventures[] = array(
+			'logo'    => $logo,
+			'name'    => $name,
+			'tagline' => get_theme_mod( "royal_limo_venture{$i}_tagline", '' ),
+			'url'     => get_theme_mod( "royal_limo_venture{$i}_url", '' ),
+		);
+	}
+
+	return array(
+		'eyebrow'  => get_theme_mod( 'royal_limo_ventures_eyebrow', 'Part of the Family' ),
+		'heading'  => get_theme_mod( 'royal_limo_ventures_heading', 'Our Ventures' ),
+		'ventures' => $ventures,
+	);
+}
+
+/**
  * The homepage "About" section content: eyebrow/heading/description plus
  * the trust bar (heading/tagline/Google rating). Fallback defaults here
  * must match the 'default' values registered in inc/customizer.php (see

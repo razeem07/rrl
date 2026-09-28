@@ -35,7 +35,8 @@
 }
 
 .custom-logo {
-	max-height: 56px;
+	max-height: 76px;
+	max-width: 500px;
 	width: auto;
 }
 
@@ -45,11 +46,6 @@
 	gap: 0.65rem;
 	min-width: 0;
 	max-width: 100%;
-}
-
-.rl-logo--custom .custom-logo-link {
-	flex: 0 0 auto;
-	display: flex;
 }
 
 .rl-logo__badge {
@@ -606,6 +602,58 @@
 
 	.rl-route__label {
 		white-space: normal;
+	}
+}
+
+/* ---- Our Ventures ---- */
+/* Only spaced apart from the route graphic above it when both blocks
+   are present in the shared section (see the --stacked modifier below);
+   as the section's only content, its own .rl-section__header/grid
+   margins already provide the right top spacing on their own. */
+.rl-ventures--stacked {
+	margin-top: var(--space-2xl);
+}
+
+.rl-ventures__grid {
+	display: grid;
+	grid-template-columns: repeat(2, 1fr);
+	gap: var(--space-md);
+}
+
+.rl-venture-card {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	gap: var(--space-sm);
+	padding: var(--space-xl) var(--space-md);
+	border: 1px solid var(--glass-border);
+	border-radius: var(--radius-lg);
+	background: var(--surface);
+	transition: border-color var(--transition-fast), transform var(--transition-fast);
+}
+
+a.rl-venture-card:hover {
+	border-color: var(--gold);
+	transform: translateY(-3px);
+}
+
+.rl-venture-card__logo {
+	max-height: 56px;
+	max-width: 80%;
+	width: auto;
+	object-fit: contain;
+}
+
+.rl-venture-card__tagline {
+	font-size: 0.95rem;
+	color: var(--text-muted);
+	text-align: center;
+}
+
+@media (max-width: 640px) {
+	.rl-ventures__grid {
+		grid-template-columns: 1fr;
 	}
 }
 

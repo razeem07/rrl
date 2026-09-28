@@ -1,7 +1,8 @@
 <?php
 /**
- * Front page: hero, service areas, about, fleet, why-us, services,
- * video showcase, testimonials, blog, FAQ, booking CTA.
+ * Front page: hero, service areas (+ our ventures, merged into one
+ * section — see template-parts/service-areas.php), about, fleet,
+ * why-us, services, video showcase, testimonials, blog, FAQ, booking CTA.
  */
 get_header();
 ?>
