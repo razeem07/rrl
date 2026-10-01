@@ -3,12 +3,18 @@
  * Template Name: About Us
  *
  * Every section on this page — the banner image, About Us, Our
- * Approach (mission/vision), Why Choose Us, Key Persons (team), and
- * What We Do — is edited directly on this page in wp-admin (sidebar
- * panel, see assets/js/admin-panels.js and
- * royal_limo_register_about_page_meta() in inc/custom-post-types.php),
- * not the Customizer. The banner title/breadcrumb use the page's own
- * title, same as every other page-header banner in the theme.
+ * Approach (mission/vision), Why Choose Us, and What We Do — is edited
+ * directly on this page in wp-admin (sidebar panel, see
+ * assets/js/admin-panels.js and royal_limo_register_about_page_meta()
+ * in inc/custom-post-types.php), not the Customizer. The banner
+ * title/breadcrumb use the page's own title, same as every other
+ * page-header banner in the theme.
+ *
+ * The "Key Persons" (team) section used to render here but was removed
+ * by request; the Team Members admin screen, its CPT, and this page's
+ * "Key Persons" text fields (heading/eyebrow/description) still exist
+ * underneath in case it comes back — nothing there was deleted, only
+ * the get_template_part() call that displayed it.
  */
 get_header();
 
@@ -30,7 +36,6 @@ $about_banner_image = get_post_meta( get_the_ID(), '_about_banner_image', true )
 get_template_part( 'template-parts/about-page-intro' );
 get_template_part( 'template-parts/our-approach' );
 get_template_part( 'template-parts/about-page-why-us' );
-get_template_part( 'template-parts/team' );
 get_template_part( 'template-parts/what-we-do' );
 get_template_part( 'template-parts/booking-cta' );
 
